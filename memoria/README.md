@@ -1,0 +1,348 @@
+<p align="center">
+  <img src="assets/memoria-logo.svg" alt="Memoria" width="520" />
+</p>
+
+<p align="center">
+  <strong>Memory-driven, token-aware development workflow for LLM coding agents.</strong>
+</p>
+
+<p align="center">
+  <a href="../LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <img alt="Node.js >=20" src="https://img.shields.io/badge/node-%3E%3D20-339933.svg" />
+  <img alt="CLI first" src="https://img.shields.io/badge/workflow-CLI%20first-111827.svg" />
+</p>
+
+Memoria helps developers work with LLMs in a structured way, similar in spirit
+to Spec-Kit and Squad-Kit, but with a smaller memory-first workflow. Instead of
+creating many spec files and repeatedly pasting broad project context, Memoria
+stores compact briefs, reusable skills, durable project memories, summaries,
+embeddings, and token-savings reports as plain files under `.memoria/`.
+
+The goal is simple: guide LLM-assisted development while sending less repeated
+context to the model.
+
+## Why Memoria
+
+- Use one compact brief per task instead of a large spec tree.
+- Save durable decisions, conventions, and session notes as project memory.
+- Recall only the most relevant code, notes, briefs, and skills for the task.
+- Explain why context was selected so developers can audit the result.
+- Measure token savings instead of guessing.
+- Work with Claude Code, Codex, GitHub Copilot Chat, Cursor, Continue, and other agent tools.
+
+## What Memoria Provides
+
+- Compact briefs for intent, recall budget, memory links, and execution path.
+- Durable project memories for decisions, conventions, notes, and sessions.
+- Skill-MD files for reusable LLM instructions.
+- Knowledge graph and embeddings for code, skills, briefs, and memories.
+- Token-budgeted context assembly with explainable `memoria recall`.
+- Hybrid semantic and keyword retrieval for more predictable matches.
+- Token counting, cost estimation, compression, and savings reports.
+
+## Workflow
+
+```text
+brief -> memory -> ingest -> recall -> savings
+```
+
+1. `brief` captures the current task in one small workflow file.
+2. `memory` records reusable project knowledge that should survive across tasks.
+3. `ingest` indexes code, briefs, skills, and memories.
+4. `recall` assembles a token-budgeted context pack for the LLM.
+5. `savings` compares the recalled context against a baseline.
+
+## Install
+
+```bash
+npm install
+npm run build
+npm link
+```
+
+Or run from source:
+
+```bash
+npm install
+npx tsx src/cli.ts <command>
+```
+
+## Quickstart
+
+```bash
+cd path/to/your/project
+memoria init
+
+# Create one compact workflow artifact
+memoria brief create "auth refresh tokens" -d "Add refresh-token support with low-token LLM context."
+
+# Capture durable memory
+memoria memory add decision "Use short-lived access tokens and rotating refresh tokens." --title "Refresh token policy" -t auth tokens
+
+# Index and retrieve context
+memoria ingest
+memoria recall "auth refresh tokens" --budget 4000
+
+# Measure token savings
+memoria savings "auth refresh tokens" --baseline all-indexed --save
+```
+
+Install slash-command guidance for an AI coding tool:
+
+```bash
+memoria agent install claude
+memoria agent install codex
+memoria agent install copilot
+```
+
+Or install every guide:
+
+```bash
+memoria agent install all
+```
+
+## Using Memoria With AI Coding Tools
+
+Memoria works as a local context layer for tools like GitHub Copilot Chat,
+Claude Code, Codex, Cursor, Continue, and other LLM coding agents.
+
+Current integration is CLI-first:
+
+1. Create or update project memory with Memoria.
+2. Run `memoria recall` for the task.
+3. Paste the recalled context into your AI tool.
+
+### Existing Project
+
+```bash
+cd existing-project
+memoria init
+memoria brief create "understand auth flow" -d "Map current auth behavior and token handling."
+memoria memory add convention "Follow existing service and repository patterns before adding new abstractions."
+memoria ingest
+memoria recall "understand auth flow" --budget 4000 --explain
+```
+
+Paste the recall output into your AI coding tool with this prompt:
+
+```text
+Use the Memoria context below as the source of truth.
+Follow the project memories and existing patterns.
+Implement the requested task with minimal changes.
+Do not invent architecture that conflicts with the retrieved context.
+
+[PASTE MEMORIA RECALL OUTPUT HERE]
+
+Task:
+Explain the current auth flow and identify where password reset should fit.
+```
+
+### New Project
+
+```bash
+mkdir my-app
+cd my-app
+git init
+memoria init
+memoria brief create "build initial app" -d "Create the first working version with clean architecture."
+memoria memory add decision "Keep the first version small and avoid premature abstractions."
+```
+
+After adding code:
+
+```bash
+memoria ingest
+memoria recall "build initial app" --budget 3000
+```
+
+### Feature Workflow
+
+```bash
+memoria brief create "add password reset" -d "Add password reset using existing auth patterns."
+memoria memory add decision "Password reset tokens expire after 15 minutes." -t auth security
+memoria ingest
+memoria recall "add password reset" --budget 4000 --explain
+```
+
+Then ask your AI coding tool:
+
+```text
+Use this Memoria context as the source of truth.
+Implement password reset support.
+Keep changes scoped and consistent with the recalled files, memories, and skills.
+
+[PASTE MEMORIA RECALL OUTPUT HERE]
+```
+
+### Measuring Savings
+
+```bash
+memoria savings "add password reset" --baseline all-indexed --save
+```
+
+This reports baseline tokens, recalled-context tokens, saved tokens, savings
+percentage, and estimated cost savings.
+
+### Slash-Command Guides
+
+Memoria can generate instruction files that teach AI coding tools how to map
+`/memoria.*` slash commands to real CLI commands:
+
+```bash
+memoria agent install all
+```
+
+This writes guides under:
+
+```text
+.memoria/agents/
+|-- README.md
+|-- generic.md
+|-- claude.md
+|-- codex.md
+|-- copilot.md
+`-- cursor.md
+```
+
+Example slash commands for the AI tool:
+
+```text
+/memoria.brief add password reset
+/memoria.memory decision Password reset tokens expire after 15 minutes
+/memoria.ingest
+/memoria.recall add password reset
+/memoria.savings add password reset
+```
+
+The generated guide tells the agent to translate those into commands like:
+
+```bash
+memoria brief create "add password reset"
+memoria memory add decision "Password reset tokens expire after 15 minutes"
+memoria ingest
+memoria recall "add password reset" --budget 4000 --explain
+memoria savings "add password reset" --baseline all-indexed --save
+```
+
+### Recommended Agent Prompt
+
+Use this shape with Claude Code, Codex, Copilot Chat, Cursor, Continue, or any
+LLM coding agent:
+
+```text
+Use the Memoria context below as the source of truth.
+Follow retrieved memories and existing project patterns.
+Keep the implementation small and update memory when you learn reusable facts.
+
+[PASTE MEMORIA RECALL OUTPUT HERE]
+
+Task:
+[YOUR TASK HERE]
+```
+
+## Commands
+
+### Foundation
+
+- `memoria init` - scaffold a `.memoria/` directory.
+- `memoria config get|set` - read and edit project settings.
+
+### Workflow
+
+- `memoria brief create <name>` - create one compact `.memoria/briefs/<name>.md` file.
+- `memoria brief path <name>` - refresh the implementation path section.
+- `memoria brief checklist <name>` - refresh the checklist section.
+- `memoria brief list|show` - inspect briefs.
+
+### Memory
+
+- `memoria memory add <type> <text>` - add `decision`, `note`, `convention`, or `session`.
+- `memoria memory update <id>` - update text, title, tags, or type.
+- `memoria memory delete <id> --yes` - delete a memory.
+- `memoria memory list` - list saved memories.
+- `memoria memory show <id>` - show a memory by id or prefix.
+- `memoria memory search <query>` - keyword search memories.
+
+### Skills
+
+- `memoria skill create <name>` - create a reusable Skill-MD file.
+- `memoria skill list|show|delete` - manage skills.
+
+### Retrieval
+
+- `memoria ingest [--no-embed] [--full]` - refresh KG and embeddings, including briefs and memories.
+- `memoria search <query>` - semantic search code, skills, briefs, and memories.
+- `memoria recall <query> --explain` - assemble token-budgeted context and show why sections were selected.
+- `memoria summarize [target]` - summarize source files.
+- `memoria cluster` - cluster code embeddings.
+
+### Agent Guides
+
+- `memoria agent install <target>` - generate slash-command guidance for `generic`, `claude`, `codex`, `copilot`, `cursor`, or `all`.
+
+### Tokens
+
+- `memoria tokens count <input>` - count tokens for a file or string.
+- `memoria tokens estimate <input>` - estimate model cost.
+- `memoria tokens compress <input>` - lossless whitespace compression.
+- `memoria savings <query>` - compare baseline context tokens with Memoria recall tokens.
+
+## `.memoria/` Layout
+
+```text
+.memoria/
+|-- config.json
+|-- briefs/
+|   `-- auth-refresh-tokens.md
+|-- memory/
+|-- agents/
+|-- skills/
+|-- reports/
+|   `-- savings/
+|-- knowledge_graph/
+|   |-- entities.json
+|   |-- relationships.json
+|   |-- clusters.json
+|   `-- summaries/
+`-- embeddings/
+    |-- index_metadata.json
+    |-- code_embeddings.jsonl
+    |-- skill_embeddings.jsonl
+    `-- context_embeddings.jsonl
+```
+
+## Token Savings
+
+Memoria should not claim a fixed savings percentage for every task. Savings
+depend on project size, prompt habits, and recall quality.
+
+Use this formula:
+
+```text
+savings_percent = 100 * (baseline_tokens - memoria_context_tokens) / baseline_tokens
+```
+
+The `memoria savings` command generates this measurement for a project. A
+realistic target is 50%-85% savings for common development workflows after
+ingest and summarization, with higher savings possible on large or repetitive
+tasks.
+
+## Development
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+## Open Source
+
+- [Contributing](../CONTRIBUTING.md)
+- [Code of Conduct](../CODE_OF_CONDUCT.md)
+- [Security Policy](../SECURITY.md)
+- [Support](../SUPPORT.md)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
