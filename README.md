@@ -10,7 +10,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
   <img alt="Node.js >=20" src="https://img.shields.io/badge/node-%3E%3D20-339933.svg" />
   <img alt="CLI first" src="https://img.shields.io/badge/workflow-CLI%20first-111827.svg" />
-  <img alt="GitHub stars" src="https://img.shields.io/github/stars/yourusername/memoria?style=social" />
+  <img alt="GitHub stars" src="https://img.shields.io/github/stars/GergesBernaba1/Memoria?style=social" />
 </p>
 
 Memoria is an open-source CLI for developers who use LLM coding agents. It
