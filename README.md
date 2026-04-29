@@ -30,8 +30,8 @@ memoria init
 # Index your codebase
 memoria ingest
 
-# Generate optimized context for your AI assistant
-memoria recall "add authentication" --budget 6000
+# Start a feature memory workflow
+memoria feature start "add authentication"
 ```
 
 **Copy the output to Copilot, Cursor, ChatGPT, or any AI tool. Save 60-80% on tokens!**
@@ -68,22 +68,34 @@ memoria ingest
 
 This creates embeddings and a knowledge graph of your code. Takes 1-5 minutes depending on project size.
 
-**3. Generate optimized context:**
+**3. Start a Feature Memory Packet:**
+```bash
+memoria feature start "add user authentication"
+```
+
+This creates or refreshes the brief, implementation path, checklist, and recall context in one command.
+
+**4. Generate optimized context directly when needed:**
 ```bash
 memoria recall "add user authentication" --budget 6000 --explain
 ```
 
-**4. Use with your AI assistant:**
+**5. Use with your AI assistant:**
 - Copy the output
 - Paste into GitHub Copilot Chat, Cursor, Claude, or ChatGPT
 - Add your question or request
 
-**5. Save what you learn:**
+**6. Finish the feature with durable memory:**
+```bash
+memoria feature finish "add user authentication" --decision "Use JWT tokens for auth"
+```
+
+**7. Save standalone learnings when needed:**
 ```bash
 memoria memory add decision "Use JWT tokens for auth" -t authentication
 ```
 
-**6. Check your savings:**
+**8. Check your savings:**
 ```bash
 memoria savings "authentication implementation"
 ```
@@ -128,27 +140,51 @@ Memoria paid for itself in the first week.
 
 ## How It's Different
 
-Similar in spirit to **Spec-Kit** and **Squad-Kit**, but focused on **economics**:
+Memoria is focused on **memory-first execution** and **economics** for AI-assisted development:
 
-| Tool | Focus | Strength |
-|------|-------|----------|
-| **Spec-Kit** | Project specifications | Better planning |
-| **Squad-Kit** | Team collaboration | Better coordination |
-| **Memoria** | Token optimization | **Lower AI bills** |
+| Focus | What Memoria provides |
+| --- | --- |
+| Feature memory | Compact briefs, implementation paths, checklists, and durable decisions |
+| Token-aware execution planning | Context packs that keep AI agents focused on the smallest useful set of files and notes |
+| Local-first project knowledge | Plain-file memory under `.memoria/` that can move with the repository |
+| Measured savings | Token and cost reports that compare recalled context against broader baselines |
 
-Memoria is intentionally smaller: one compact brief, reusable memory, indexed project context, and **measured savings**.
+For each task, Memoria creates a **Feature Memory Packet**:
+
+```text
+brief + implementation path + checklist + recalled context + durable decisions + savings report
+```
+
+Memoria is intentionally smaller: compact briefs, reusable memory, indexed project context, token-aware implementation planning, and **measured savings**.
+
+## Use Cases
+
+Memoria supports the full AI-assisted development loop, from a new project to feature work, bug fixes, refactors, team handoffs, and onboarding.
+
+| Scenario | How Memoria helps |
+| --- | --- |
+| New project setup | Creates local project memory, indexes the codebase, and installs agent instructions from day one |
+| New feature implementation | Creates a Feature Memory Packet, recalls focused context, tracks status, and saves durable decisions |
+| Bug fixes | Gives the agent targeted context and stores the root-cause lesson for future recalls |
+| Refactoring | Captures the goal, recalls related architecture, and records the new design decision |
+| Team handoffs | Stores session notes so the next developer can continue with focused context |
+| Onboarding | Gives new developers curated project context without reading the whole repo |
+
+See [USE_CASES.md](USE_CASES.md) for scenario-by-scenario CLI workflows.
 
 ## Core Workflow
 
 ```text
-brief -> memory -> ingest -> recall -> savings
+init -> ingest -> feature start -> implement -> feature finish -> savings
 ```
 
-- `brief` captures the current task in one compact file.
-- `memory` stores reusable decisions, conventions, notes, and sessions.
+- `feature start` creates or refreshes the brief, path, checklist, and recall context.
+- `feature status` shows checklist progress, related memory, and savings reports.
+- `feature finish` saves durable decisions, refreshes the index, and writes a savings report.
 - `ingest` indexes code, skills, briefs, and memories.
 - `recall` creates a token-budgeted context pack for Claude Code, Codex, Copilot Chat, Cursor, Continue, or another LLM agent.
 - `savings` compares recalled context against a baseline.
+- `doctor` checks Memoria workspace health and setup hints.
 
 ## Developer Workflow
 
@@ -156,11 +192,8 @@ brief -> memory -> ingest -> recall -> savings
 
 **1. Morning: Start a New Feature**
 ```bash
-# Create a brief for today's task
-memoria brief create "add stripe payment" -d "Integrate Stripe checkout with existing cart"
-
-# Recall relevant context with token budget
-memoria recall "stripe payment" --budget 6000 --explain
+# Create a Feature Memory Packet and recall relevant context
+memoria feature start "add stripe payment" -d "Integrate Stripe checkout with existing cart"
 
 # Copy output to Cursor/Claude and start coding
 ```
@@ -170,14 +203,14 @@ memoria recall "stripe payment" --budget 6000 --explain
 # Made a decision? Save it for next time
 memoria memory add decision "Use Stripe webhooks for payment confirmation" -t payments stripe
 
-# Found a useful pattern? Save it
-memoria memory add pattern "Always validate webhook signatures" -t security payments
+# Found a reusable convention? Save it
+memoria memory add convention "Always validate webhook signatures" -t security payments
 ```
 
 **3. End of Day: Track Savings**
 ```bash
 # See how much you saved today
-memoria savings "stripe payment" --baseline all-indexed --save
+memoria feature finish "stripe payment" --decision "Use Stripe webhooks for payment confirmation"
 
 # Output: "Saved $4.23 across 8 requests today"
 ```
@@ -268,12 +301,16 @@ memoria recall "getting started" --budget 8000
 | Command | Use When | Frequency |
 |---------|----------|-----------|
 | `init` | New project or repo | Once |
+| `feature start` | Starting a feature with brief, path, checklist, and recall | Every feature |
+| `feature status` | Checking feature memory, checklist, and savings state | During feature work |
+| `feature finish` | Saving final decisions, ingesting changes, and writing savings report | End of feature |
 | `brief create` | Starting new task/feature | Daily |
 | `memory add` | Made important decision | As needed |
 | `ingest` | Code changed significantly | Weekly |
 | `recall` | Need context for AI agent | Every request |
 | `savings` | Want to track ROI | Daily/Weekly |
 | `agent install` | Setup new AI tool | Once per tool |
+| `doctor` | Validate workspace setup | When setup feels wrong |
 
 ---
 
@@ -315,12 +352,34 @@ Then use Memoria protocol commands inside your agent chat:
 
 ```text
 /memoria.brief add password reset
+/memoria.feature.start add password reset
+/memoria.feature.status add password reset
 /memoria.ingest
 /memoria.recall add password reset
+/memoria.feature.finish add password reset
 /memoria.savings add password reset
+/memoria.doctor
 ```
 
 The agent maps those requests to CLI commands such as `memoria recall "add password reset" --budget 4000 --explain`, runs them when shell access is available, and uses the returned context as the source of truth.
+
+Expected behavior by feature:
+
+| User command | What happens | What the user gets |
+| --- | --- | --- |
+| `/memoria.init` | Runs `memoria init` | A `.memoria/` workspace with config, briefs, memory, reports, and agent-guide directories |
+| `/memoria.brief <task>` | Runs `memoria brief create "<task>"` | A compact task brief under `.memoria/briefs/` |
+| `/memoria.path <task>` | Runs `memoria brief path "<task>"` | A refreshed implementation-path section in the task brief |
+| `/memoria.checklist <task>` | Runs `memoria brief checklist "<task>"` | A refreshed checklist section in the task brief |
+| `/memoria.feature.start <feature>` | Runs `memoria feature start "<feature>"` | A Feature Memory Packet with brief, path, checklist, and recall context |
+| `/memoria.feature.status <feature>` | Runs `memoria feature status "<feature>"` | Checklist, related memory, and savings status |
+| `/memoria.feature.finish <feature>` | Runs `memoria feature finish "<feature>"` | Refreshed index, saved savings report, and optional durable decision |
+| `/memoria.ingest` | Runs `memoria ingest` | Updated project index, embeddings, and knowledge graph data |
+| `/memoria.recall <task>` | Runs `memoria recall "<task>" --budget 4000 --explain` | Token-budgeted context with an explanation of why sections were included |
+| `/memoria.search <query>` | Runs `memoria search "<query>"` | Semantic matches from indexed code, skills, briefs, and memory |
+| `/memoria.savings <task>` | Runs `memoria savings "<task>" --baseline all-indexed --save` | A token and cost savings report saved under `.memoria/reports/savings/` |
+| `/memoria.memories <query>` | Runs `memoria memory search "<query>"` | Matching durable decisions, conventions, notes, and session records |
+| `/memoria.doctor` | Runs `memoria doctor` | Workspace health checks and setup hints |
 
 ---
 
@@ -333,6 +392,8 @@ The agent maps those requests to CLI commands such as `memoria recall "add passw
 | **Persistent Memory** | Reuses decisions, conventions, notes, and session handoff context |
 | **Smart Indexing** | Builds semantic search data and a lightweight knowledge graph from the project |
 | **Task Briefs** | Captures goals, implementation paths, and checklists in compact `.memoria/briefs/` files |
+| **Feature Memory Packets** | Combines feature brief, path, checklist, recall context, durable decisions, and savings report |
+| **Workspace Doctor** | Checks Memoria setup, index files, agent instructions, and project memory counts |
 | **Agent Integration** | Generates guides, instructions, prompt files, command files, Codex skills, and `AGENTS.md` |
 | **Slash-Command Protocol** | Maps `/memoria.*` chat requests to real `memoria` CLI commands |
 | **Agent Agnostic** | Works with Codex, Claude Code, Copilot, Cursor, Windsurf, Continue, Aider, and generic tools |
@@ -343,6 +404,7 @@ The agent maps those requests to CLI commands such as `memoria recall "add passw
 ## Documentation
 
 - **[Getting Started Guide](GETTING_STARTED.md)** - Complete installation and usage tutorial
+- **[Use Cases](USE_CASES.md)** - Scenario-based workflows for new projects, features, bugs, refactors, handoffs, and onboarding
 - **[Full CLI Reference](memoria/README.md)** - All commands and options
 - **[Roadmap & Plan](memoria/PLAN.md)** - Future features and architecture
 

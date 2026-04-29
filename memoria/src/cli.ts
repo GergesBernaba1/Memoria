@@ -12,6 +12,8 @@ import { briefChecklist, briefCreate, briefList, briefPath, briefShow } from "./
 import { memoryAdd, memoryDelete, memoryList, memorySearch, memoryShow, memoryUpdate } from "./commands/memory.js";
 import { runSavings } from "./commands/savings.js";
 import { agentInstall, isAgentTarget } from "./commands/agent.js";
+import { runDoctor } from "./commands/doctor.js";
+import { featureFinish, featureStart, featureStatus } from "./commands/feature.js";
 import { logger } from "./utils/logger.js";
 
 const program = new Command();
@@ -265,6 +267,69 @@ agent
       throw new Error("target must be one of: generic, claude, codex, copilot, cursor, all");
     }
     await agentInstall(target);
+  });
+
+const feature = program.command("feature").description("Manage Feature Memory Packets");
+feature
+  .command("start <name>")
+  .description("Create or refresh a feature brief, path, checklist, and recall context")
+  .option("-d, --description <text>", "Short feature goal")
+  .option("-b, --budget <n>", "Recall token budget", (v) => parseInt(v, 10))
+  .option("--no-recall", "Skip recall output")
+  .option("--no-explain", "Skip recall explanation")
+  .option("--json", "Output packet metadata as JSON")
+  .action(
+    async (
+      name: string,
+      opts: { description?: string; budget?: number; recall?: boolean; explain?: boolean; json?: boolean },
+    ) => {
+      await featureStart(name, {
+        description: opts.description,
+        budgetTokens: opts.budget,
+        recall: opts.recall,
+        explain: opts.explain,
+        json: opts.json,
+      });
+    },
+  );
+
+feature
+  .command("status <name>")
+  .description("Show feature brief, checklist, memory, and savings status")
+  .option("--json", "Output as JSON")
+  .action(async (name: string, opts: { json?: boolean }) => {
+    await featureStatus(name, { json: opts.json });
+  });
+
+feature
+  .command("finish <name>")
+  .description("Save final feature memory, refresh index, and write a savings report")
+  .option("--decision <text>", "Durable decision to save for future work")
+  .option("--no-ingest", "Skip ingest")
+  .option("--no-savings", "Skip savings report")
+  .option("-b, --budget <n>", "Recall token budget for savings", (v) => parseInt(v, 10))
+  .option("--json", "Output as JSON")
+  .action(
+    async (
+      name: string,
+      opts: { decision?: string; ingest?: boolean; savings?: boolean; budget?: number; json?: boolean },
+    ) => {
+      await featureFinish(name, {
+        decision: opts.decision,
+        ingest: opts.ingest,
+        savings: opts.savings,
+        budgetTokens: opts.budget,
+        json: opts.json,
+      });
+    },
+  );
+
+program
+  .command("doctor")
+  .description("Check Memoria workspace health and setup hints")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    await runDoctor({ json: opts.json });
   });
 
 // ---- v2 commands ----

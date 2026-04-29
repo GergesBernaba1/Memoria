@@ -8,6 +8,15 @@ export { briefChecklist, briefCreate, briefList, briefPath, briefShow } from "./
 export { memoryAdd, memoryDelete, memoryList, memorySearch, memoryShow, memoryUpdate } from "./commands/memory.js";
 export { runSavings, type SavingsOptions, type SavingsReport } from "./commands/savings.js";
 export { agentInstall, isAgentTarget, type AgentInstallOptions, type AgentTarget } from "./commands/agent.js";
+export { runDoctor, type DoctorReport } from "./commands/doctor.js";
+export {
+  featureFinish,
+  featureStart,
+  featureStatus,
+  type FeatureFinishOptions,
+  type FeatureStartOptions,
+  type FeatureStatus,
+} from "./commands/feature.js";
 
 export {
   ConfigSchema,

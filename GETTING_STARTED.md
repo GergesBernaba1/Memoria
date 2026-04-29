@@ -290,14 +290,14 @@ Using the context above, help me add Stripe payment integration to the checkout 
 
 #### Step 5: Save What You Learned
 
-As you work, save decisions and patterns:
+As you work, save decisions and conventions:
 
 ```bash
 # Save a decision
 memoria memory add decision "Use Stripe webhooks for async payment confirmation" -t payments stripe
 
-# Save a pattern
-memoria memory add pattern "Validate webhook signatures before processing" -t security payments
+# Save a convention
+memoria memory add convention "Validate webhook signatures before processing" -t security payments
 
 # Save a note
 memoria memory add note "Stripe test key starts with sk_test_" -t payments testing
@@ -346,12 +346,15 @@ Savings:                  37,067 tokens → $0.56 (82%)
 | `memoria brief create <title>` | Create new task brief |
 | `memoria brief list` | List all briefs |
 | `memoria brief show <id>` | View a specific brief |
+| `memoria feature start <name>` | Create a Feature Memory Packet and recall context |
+| `memoria feature status <name>` | Show checklist, related memory, and savings state |
+| `memoria feature finish <name>` | Save final memory, refresh index, and write savings report |
 
 ### Memory Management
 
 | Command | Description |
 |---------|-------------|
-| `memoria memory add <type> <content>` | Add decision/pattern/note |
+| `memoria memory add <type> <content>` | Add decision/convention/note/session |
 | `memoria memory list` | View all memories |
 | `memoria memory search <query>` | Search memories |
 
@@ -372,6 +375,7 @@ Savings:                  37,067 tokens → $0.56 (82%)
 | `memoria cluster` | Group similar code files |
 | `memoria skill` | Manage skill templates |
 | `memoria tokens` | Token analysis tools |
+| `memoria doctor` | Check workspace setup and next-step hints |
 
 ---
 
@@ -502,11 +506,15 @@ All tools understand these commands:
 |---------|--------------|
 | `/memoria.recall <task>` | Generate optimized context |
 | `/memoria.brief <task>` | Create a task brief |
+| `/memoria.feature.start <feature>` | Create a Feature Memory Packet |
+| `/memoria.feature.status <feature>` | Check feature memory status |
+| `/memoria.feature.finish <feature>` | Finish feature with memory and savings |
 | `/memoria.ingest` | Re-index codebase |
 | `/memoria.memory decision "<text>"` | Save a decision |
 | `/memoria.memory convention "<text>"` | Save a convention |
 | `/memoria.memory note "<text>"` | Save a note |
 | `/memoria.savings <task>` | Check token savings |
+| `/memoria.doctor` | Check Memoria setup |
 
 **Important:** These are shortcuts the AI understands. You still run the actual `memoria` commands in your terminal and paste results back.
 
@@ -527,10 +535,10 @@ git commit -m "Add Memoria with AI tool integration"
 
 # 3. Use in any AI tool
 # In Copilot/Cursor/Claude chat:
-/memoria.recall add user authentication
+/memoria.feature.start add user authentication
 
 # 4. Run suggested command
-memoria recall "add user authentication"
+memoria feature start "add user authentication"
 
 # 5. Paste output back to AI
 # 6. Code with AI using optimized context!
@@ -569,8 +577,8 @@ memoria search "theme colors styling"
 memoria recall "theme styling dark mode" --budget 8000
 
 # 4. Build feature with AI
-# 5. Document patterns
-memoria memory add pattern "Theme values stored in CSS custom properties" -t ui theming
+# 5. Document conventions
+memoria memory add convention "Theme values stored in CSS custom properties" -t ui theming
 ```
 
 ### Example 3: Refactoring

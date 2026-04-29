@@ -45,6 +45,24 @@ const COMMANDS: MemoriaCommand[] = [
     cli: 'memoria brief checklist "$ARGUMENTS"',
   },
   {
+    name: "memoria.feature.start",
+    args: "<feature>",
+    description: "Create or refresh a Feature Memory Packet.",
+    cli: 'memoria feature start "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.feature.status",
+    args: "<feature>",
+    description: "Show Feature Memory Packet status.",
+    cli: 'memoria feature status "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.feature.finish",
+    args: "<feature>",
+    description: "Finish a feature with ingest and savings report.",
+    cli: 'memoria feature finish "$ARGUMENTS"',
+  },
+  {
     name: "memoria.ingest",
     args: "",
     description: "Refresh Memoria's code graph and embeddings.",
@@ -73,6 +91,12 @@ const COMMANDS: MemoriaCommand[] = [
     args: "<query>",
     description: "Search durable Memoria memory records.",
     cli: 'memoria memory search "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.doctor",
+    args: "",
+    description: "Check Memoria workspace health.",
+    cli: "memoria doctor",
   },
 ];
 
@@ -242,12 +266,16 @@ guessing, broad file reads, or asking the user to paste many files.
 | \`/memoria.brief <task>\` | \`memoria brief create "<task>"\` |
 | \`/memoria.path <task>\` | \`memoria brief path "<task>"\` |
 | \`/memoria.checklist <task>\` | \`memoria brief checklist "<task>"\` |
+| \`/memoria.feature.start <feature>\` | \`memoria feature start "<feature>"\` |
+| \`/memoria.feature.status <feature>\` | \`memoria feature status "<feature>"\` |
+| \`/memoria.feature.finish <feature>\` | \`memoria feature finish "<feature>"\` |
 | \`/memoria.memory <type> <text>\` | \`memoria memory add <type> "<text>"\` |
 | \`/memoria.ingest\` | \`memoria ingest\` |
 | \`/memoria.recall <task>\` | \`memoria recall "<task>" --budget 4000 --explain\` |
 | \`/memoria.search <query>\` | \`memoria search "<query>"\` |
 | \`/memoria.savings <task>\` | \`memoria savings "<task>" --baseline all-indexed --save\` |
 | \`/memoria.memories <query>\` | \`memoria memory search "<query>"\` |
+| \`/memoria.doctor\` | \`memoria doctor\` |
 
 Allowed memory types:
 
@@ -261,16 +289,17 @@ Allowed memory types:
 For a new task:
 
 1. If no brief exists, run \`memoria brief create "<task>"\`.
-2. Run \`memoria ingest\` if code or memory changed.
-3. Run \`memoria recall "<task>" --budget 4000 --explain\`.
-4. Use the recalled context as the source of truth.
-5. After durable decisions are made, store them with \`memoria memory add decision "..."\`.
-6. Run \`memoria savings "<task>" --baseline all-indexed --save\` when the user asks for savings.
+2. Prefer \`memoria feature start "<task>"\` when the user wants a complete Feature Memory Packet.
+3. Run \`memoria ingest\` if code or memory changed.
+4. Run \`memoria recall "<task>" --budget 4000 --explain\`.
+5. Use the recalled context as the source of truth.
+6. After durable decisions are made, store them with \`memoria memory add decision "..."\`.
+7. Run \`memoria feature finish "<task>" --decision "..."\` when the feature is complete.
 
 ## Behavior Guidance
 
 - Keep generated briefs compact.
-- Do not create long spec documents unless the user explicitly asks.
+- Do not create long planning documents unless the user explicitly asks.
 - Do not paste broad source trees into the prompt when recall can provide focused context.
 - Respect memories and conventions as project-level guidance.
 - If recall output is insufficient, ask for one additional targeted command or file, not many files.
@@ -416,12 +445,16 @@ When the user types \`/memoria.*\` commands, map them to Memoria CLI commands:
 |--------------|-----------------|
 | \`/memoria.recall <task>\` | \`memoria recall "<task>"\` |
 | \`/memoria.brief <task>\` | \`memoria brief create "<task>"\` |
+| \`/memoria.feature.start <feature>\` | \`memoria feature start "<feature>"\` |
+| \`/memoria.feature.status <feature>\` | \`memoria feature status "<feature>"\` |
+| \`/memoria.feature.finish <feature>\` | \`memoria feature finish "<feature>"\` |
 | \`/memoria.ingest\` | \`memoria ingest\` |
 | \`/memoria.memory decision "<text>"\` | \`memoria memory add decision "<text>"\` |
 | \`/memoria.memory note "<text>"\` | \`memoria memory add note "<text>"\` |
 | \`/memoria.memory convention "<text>"\` | \`memoria memory add convention "<text>"\` |
 | \`/memoria.search <query>\` | \`memoria search "<query>"\` |
 | \`/memoria.savings <task>\` | \`memoria savings "<task>"\` |
+| \`/memoria.doctor\` | \`memoria doctor\` |
 
 ## How to Use Memoria with ${toolName}
 

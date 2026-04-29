@@ -7,6 +7,8 @@ import { memoriaPathsFor } from "../src/core/paths.js";
 import { briefChecklist, briefCreate, briefPath } from "../src/commands/brief.js";
 import { memoryAdd, memoryDelete, memorySearch, memoryUpdate } from "../src/commands/memory.js";
 import { agentInstall } from "../src/commands/agent.js";
+import { featureFinish, featureStart, featureStatus } from "../src/commands/feature.js";
+import { runDoctor } from "../src/commands/doctor.js";
 
 async function tmpDir(prefix = "memoria-workflow-test-"): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), prefix));
@@ -82,7 +84,7 @@ describe("workflow commands", () => {
     const files = await agentInstall("all", { cwd: dir });
     const paths = memoriaPathsFor(dir);
 
-    expect(files).toHaveLength(29);
+    expect(files).toHaveLength(37);
     await expect(fs.readFile(path.join(paths.agentsDir, "README.md"), "utf8")).resolves.toContain(
       "Memoria Agent Guides",
     );
@@ -101,5 +103,42 @@ describe("workflow commands", () => {
     await expect(fs.readFile(path.join(dir, "AGENTS.md"), "utf8")).resolves.toContain(
       "Codex currently exposes built-in slash commands and skills",
     );
+  });
+
+  it("manages a feature memory packet", async () => {
+    const dir = await tmpDir();
+    await runInit({ cwd: dir });
+
+    const brief = await featureStart("Password Reset", {
+      cwd: dir,
+      description: "Add reset email flow.",
+      recall: false,
+    });
+    await expect(fs.readFile(brief, "utf8")).resolves.toContain("Add reset email flow.");
+
+    let status = await featureStatus("Password Reset", { cwd: dir, json: true });
+    expect(status.slug).toBe("password-reset");
+    expect(status.checklist.total).toBeGreaterThan(0);
+    expect(status.relatedMemories).toBe(0);
+
+    await featureFinish("Password Reset", {
+      cwd: dir,
+      decision: "Password reset tokens expire after 15 minutes.",
+      ingest: false,
+      savings: false,
+    });
+
+    status = await featureStatus("Password Reset", { cwd: dir, json: true });
+    expect(status.relatedMemories).toBe(1);
+  });
+
+  it("reports workspace health", async () => {
+    const dir = await tmpDir();
+    await runInit({ cwd: dir });
+
+    const report = await runDoctor({ cwd: dir, json: true });
+    expect(report.projectRoot).toBe(dir);
+    expect(report.checks.some((check) => check.name === "config" && check.ok)).toBe(true);
+    expect(report.checks.some((check) => check.name === "brief count")).toBe(true);
   });
 });

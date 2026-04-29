@@ -20,6 +20,7 @@ export interface SavingsOptions {
   outputTokens?: number;
   save?: boolean;
   json?: boolean;
+  silent?: boolean;
   cwd?: string;
 }
 
@@ -91,6 +92,7 @@ export async function runSavings(query: string, opts: SavingsOptions = {}): Prom
     logger.json(report);
     return report;
   }
+  if (opts.silent) return report;
 
   logger.raw(`query:           ${query}`);
   logger.raw(`baseline:        ${baselineMode}`);

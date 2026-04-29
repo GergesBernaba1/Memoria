@@ -12,27 +12,29 @@
   <img alt="CLI first" src="https://img.shields.io/badge/workflow-CLI%20first-111827.svg" />
 </p>
 
-Memoria helps developers work with LLMs in a structured way, similar in spirit
-to Spec-Kit and Squad-Kit, but with a smaller memory-first workflow. Instead of
-creating many spec files and repeatedly pasting broad project context, Memoria
-stores compact briefs, reusable skills, durable project memories, summaries,
-embeddings, and token-savings reports as plain files under `.memoria/`.
+Memoria helps developers work with LLMs through a compact memory-first workflow.
+Instead of repeatedly pasting broad project context, Memoria stores compact
+briefs, reusable skills, durable project memories, summaries, embeddings, and
+token-savings reports as plain files under `.memoria/`.
 
 The goal is simple: guide LLM-assisted development while sending less repeated
 context to the model.
 
 ## Why Memoria
 
-- Use one compact brief per task instead of a large spec tree.
+- Use one compact brief per task instead of large generated planning documents.
+- Start, inspect, and finish Feature Memory Packets with one command group.
 - Save durable decisions, conventions, and session notes as project memory.
 - Recall only the most relevant code, notes, briefs, and skills for the task.
 - Explain why context was selected so developers can audit the result.
 - Measure token savings instead of guessing.
+- Check setup health with `memoria doctor`.
 - Work with Claude Code, Codex, GitHub Copilot Chat, Cursor, Continue, and other agent tools.
 
 ## What Memoria Provides
 
 - Compact briefs for intent, recall budget, memory links, and execution path.
+- Feature workflow commands for start/status/finish.
 - Durable project memories for decisions, conventions, notes, and sessions.
 - Skill-MD files for reusable LLM instructions.
 - Knowledge graph and embeddings for code, skills, briefs, and memories.
@@ -43,14 +45,15 @@ context to the model.
 ## Workflow
 
 ```text
-brief -> memory -> ingest -> recall -> savings
+init -> ingest -> feature start -> implement -> feature finish -> savings
 ```
 
-1. `brief` captures the current task in one small workflow file.
-2. `memory` records reusable project knowledge that should survive across tasks.
-3. `ingest` indexes code, briefs, skills, and memories.
-4. `recall` assembles a token-budgeted context pack for the LLM.
-5. `savings` compares the recalled context against a baseline.
+1. `init` creates the `.memoria/` workspace.
+2. `ingest` indexes code, briefs, skills, and memories.
+3. `feature start` creates a Feature Memory Packet and recall context.
+4. `feature status` shows progress while work is active.
+5. `feature finish` records durable decisions, refreshes the index, and saves a savings report.
+6. `recall` remains available for direct token-budgeted context assembly.
 
 ## Install
 
@@ -73,18 +76,18 @@ npx tsx src/cli.ts <command>
 cd path/to/your/project
 memoria init
 
-# Create one compact workflow artifact
-memoria brief create "auth refresh tokens" -d "Add refresh-token support with low-token LLM context."
+# Start a Feature Memory Packet
+memoria feature start "auth refresh tokens" -d "Add refresh-token support with low-token LLM context."
 
 # Capture durable memory
 memoria memory add decision "Use short-lived access tokens and rotating refresh tokens." --title "Refresh token policy" -t auth tokens
 
-# Index and retrieve context
+# Index and retrieve context directly when needed
 memoria ingest
 memoria recall "auth refresh tokens" --budget 4000
 
-# Measure token savings
-memoria savings "auth refresh tokens" --baseline all-indexed --save
+# Finish with durable memory and savings
+memoria feature finish "auth refresh tokens" --decision "Use short-lived access tokens and rotating refresh tokens."
 ```
 
 Install slash-command guidance for an AI coding tool:
@@ -117,7 +120,7 @@ Current integration is CLI-first:
 ```bash
 cd existing-project
 memoria init
-memoria brief create "understand auth flow" -d "Map current auth behavior and token handling."
+memoria feature start "understand auth flow" -d "Map current auth behavior and token handling."
 memoria memory add convention "Follow existing service and repository patterns before adding new abstractions."
 memoria ingest
 memoria recall "understand auth flow" --budget 4000 --explain
@@ -144,7 +147,7 @@ mkdir my-app
 cd my-app
 git init
 memoria init
-memoria brief create "build initial app" -d "Create the first working version with clean architecture."
+memoria feature start "build initial app" -d "Create the first working version with clean architecture."
 memoria memory add decision "Keep the first version small and avoid premature abstractions."
 ```
 
@@ -158,10 +161,8 @@ memoria recall "build initial app" --budget 3000
 ### Feature Workflow
 
 ```bash
-memoria brief create "add password reset" -d "Add password reset using existing auth patterns."
-memoria memory add decision "Password reset tokens expire after 15 minutes." -t auth security
-memoria ingest
-memoria recall "add password reset" --budget 4000 --explain
+memoria feature start "add password reset" -d "Add password reset using existing auth patterns."
+memoria feature status "add password reset"
 ```
 
 Then ask your AI coding tool:
@@ -178,6 +179,7 @@ Keep changes scoped and consistent with the recalled files, memories, and skills
 
 ```bash
 memoria savings "add password reset" --baseline all-indexed --save
+memoria feature finish "add password reset" --decision "Password reset tokens expire after 15 minutes."
 ```
 
 This reports baseline tokens, recalled-context tokens, saved tokens, savings
@@ -208,20 +210,28 @@ Example slash commands for the AI tool:
 
 ```text
 /memoria.brief add password reset
+/memoria.feature.start add password reset
+/memoria.feature.status add password reset
 /memoria.memory decision Password reset tokens expire after 15 minutes
 /memoria.ingest
 /memoria.recall add password reset
+/memoria.feature.finish add password reset
 /memoria.savings add password reset
+/memoria.doctor
 ```
 
 The generated guide tells the agent to translate those into commands like:
 
 ```bash
 memoria brief create "add password reset"
+memoria feature start "add password reset"
+memoria feature status "add password reset"
 memoria memory add decision "Password reset tokens expire after 15 minutes"
 memoria ingest
 memoria recall "add password reset" --budget 4000 --explain
+memoria feature finish "add password reset"
 memoria savings "add password reset" --baseline all-indexed --save
+memoria doctor
 ```
 
 ### Recommended Agent Prompt
@@ -253,6 +263,9 @@ Task:
 - `memoria brief path <name>` - refresh the implementation path section.
 - `memoria brief checklist <name>` - refresh the checklist section.
 - `memoria brief list|show` - inspect briefs.
+- `memoria feature start <name>` - create or refresh a Feature Memory Packet and recall context.
+- `memoria feature status <name>` - show checklist, related memory, and savings state.
+- `memoria feature finish <name>` - save final memory, refresh index, and write a savings report.
 
 ### Memory
 
@@ -279,6 +292,7 @@ Task:
 ### Agent Guides
 
 - `memoria agent install <target>` - generate slash-command guidance for `generic`, `claude`, `codex`, `copilot`, `cursor`, or `all`.
+- `memoria doctor` - check workspace setup, index files, agent instructions, and project memory counts.
 
 ### Tokens
 

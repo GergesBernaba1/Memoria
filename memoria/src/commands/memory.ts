@@ -114,7 +114,7 @@ export async function memoryDelete(id: string, opts: { cwd?: string; yes?: boole
 
 export async function memorySearch(
   query: string,
-  opts: MemoryListOptions & { top?: number } = {},
+  opts: MemoryListOptions & { top?: number; silent?: boolean } = {},
 ): Promise<MemoryRecord[]> {
   const records = await readMemories(opts.cwd);
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -132,6 +132,7 @@ export async function memorySearch(
     logger.json(hits);
     return hits;
   }
+  if (opts.silent) return hits;
   if (hits.length === 0) {
     logger.info("No matching memories.");
     return hits;
