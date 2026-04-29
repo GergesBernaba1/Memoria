@@ -16,6 +16,6 @@
   <path d="M550 145V93H567L569 101C572 95 578 92 586 92C589 92 591 92 593 93V111C590 110 587 109 584 109C574 109 569 114 569 125V145H550Z" fill="#111827"/>
   <path d="M600 145V93H619V145H600ZM599 86V70H620V86H599Z" fill="#111827"/>
   <path d="M650 147C637 147 628 139 628 128C628 117 637 110 653 110H665V109C665 104 661 102 655 102C648 102 641 104 635 107L630 94C638 90 647 88 658 88C675 88 684 96 684 112V145H668L666 140C662 144 657 147 650 147ZM656 135C662 135 665 131 665 126V122H656C650 122 647 124 647 128C647 132 650 135 656 135Z" fill="#111827"/>
-  <path d="M230 170H683" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
-  <text x="230" y="194" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="600">Memory-driven, token-aware workflow for LLM agents</text>
+  <path d="M230 170H740" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+  <text x="230" y="194" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500">Memory-driven, token-aware development for LLM coding agents</text>
 </svg>
