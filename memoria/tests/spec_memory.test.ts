@@ -7,7 +7,7 @@ import { memoriaPathsFor } from "../src/core/paths.js";
 import { briefChecklist, briefCreate, briefPath } from "../src/commands/brief.js";
 import { memoryAdd, memoryDelete, memorySearch, memoryUpdate } from "../src/commands/memory.js";
 import { agentInstall } from "../src/commands/agent.js";
-import { featureFinish, featureStart, featureStatus } from "../src/commands/feature.js";
+import { featureDone, featureFinish, featureList, featurePacket, featureStart, featureStatus } from "../src/commands/feature.js";
 import { runDoctor } from "../src/commands/doctor.js";
 
 async function tmpDir(prefix = "memoria-workflow-test-"): Promise<string> {
@@ -84,7 +84,7 @@ describe("workflow commands", () => {
     const files = await agentInstall("all", { cwd: dir });
     const paths = memoriaPathsFor(dir);
 
-    expect(files).toHaveLength(37);
+    expect(files).toHaveLength(45);
     await expect(fs.readFile(path.join(paths.agentsDir, "README.md"), "utf8")).resolves.toContain(
       "Memoria Agent Guides",
     );
@@ -118,8 +118,14 @@ describe("workflow commands", () => {
 
     let status = await featureStatus("Password Reset", { cwd: dir, json: true });
     expect(status.slug).toBe("password-reset");
-    expect(status.checklist.total).toBeGreaterThan(0);
+    expect(status.checklist.total).toBe(5);
     expect(status.relatedMemories).toBe(0);
+
+    const features = await featureList({ cwd: dir, json: true });
+    expect(features.map((feature) => feature.slug)).toContain("password-reset");
+
+    status = await featureDone("Password Reset", "1", { cwd: dir, json: true });
+    expect(status.checklist.done).toBe(1);
 
     await featureFinish("Password Reset", {
       cwd: dir,
@@ -130,6 +136,10 @@ describe("workflow commands", () => {
 
     status = await featureStatus("Password Reset", { cwd: dir, json: true });
     expect(status.relatedMemories).toBe(1);
+
+    const packet = await featurePacket("Password Reset", { cwd: dir, json: true });
+    expect(packet.brief).toContain("Add reset email flow.");
+    expect(packet.memories).toHaveLength(1);
   });
 
   it("reports workspace health", async () => {

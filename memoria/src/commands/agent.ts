@@ -51,10 +51,28 @@ const COMMANDS: MemoriaCommand[] = [
     cli: 'memoria feature start "$ARGUMENTS"',
   },
   {
+    name: "memoria.feature.list",
+    args: "",
+    description: "List Feature Memory Packets.",
+    cli: "memoria feature list",
+  },
+  {
     name: "memoria.feature.status",
     args: "<feature>",
     description: "Show Feature Memory Packet status.",
     cli: 'memoria feature status "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.feature.done",
+    args: "<feature> <item>",
+    description: "Mark a Feature Memory Packet checklist item done.",
+    cli: 'memoria feature done "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.feature.packet",
+    args: "<feature>",
+    description: "Print a shareable Feature Memory Packet.",
+    cli: 'memoria feature packet "$ARGUMENTS"',
   },
   {
     name: "memoria.feature.finish",
@@ -73,6 +91,12 @@ const COMMANDS: MemoriaCommand[] = [
     args: "<task>",
     description: "Recall token-budgeted Memoria context for a task.",
     cli: 'memoria recall "$ARGUMENTS" --budget 4000 --explain',
+  },
+  {
+    name: "memoria.ask",
+    args: "<question>",
+    description: "Ask an LLM using Memoria recalled context.",
+    cli: 'memoria ask "$ARGUMENTS"',
   },
   {
     name: "memoria.search",
@@ -267,11 +291,15 @@ guessing, broad file reads, or asking the user to paste many files.
 | \`/memoria.path <task>\` | \`memoria brief path "<task>"\` |
 | \`/memoria.checklist <task>\` | \`memoria brief checklist "<task>"\` |
 | \`/memoria.feature.start <feature>\` | \`memoria feature start "<feature>"\` |
+| \`/memoria.feature.list\` | \`memoria feature list\` |
 | \`/memoria.feature.status <feature>\` | \`memoria feature status "<feature>"\` |
+| \`/memoria.feature.done <feature> <item>\` | \`memoria feature done "<feature>" "<item>"\` |
+| \`/memoria.feature.packet <feature>\` | \`memoria feature packet "<feature>"\` |
 | \`/memoria.feature.finish <feature>\` | \`memoria feature finish "<feature>"\` |
 | \`/memoria.memory <type> <text>\` | \`memoria memory add <type> "<text>"\` |
 | \`/memoria.ingest\` | \`memoria ingest\` |
 | \`/memoria.recall <task>\` | \`memoria recall "<task>" --budget 4000 --explain\` |
+| \`/memoria.ask <question>\` | \`memoria ask "<question>"\` |
 | \`/memoria.search <query>\` | \`memoria search "<query>"\` |
 | \`/memoria.savings <task>\` | \`memoria savings "<task>" --baseline all-indexed --save\` |
 | \`/memoria.memories <query>\` | \`memoria memory search "<query>"\` |
@@ -446,7 +474,10 @@ When the user types \`/memoria.*\` commands, map them to Memoria CLI commands:
 | \`/memoria.recall <task>\` | \`memoria recall "<task>"\` |
 | \`/memoria.brief <task>\` | \`memoria brief create "<task>"\` |
 | \`/memoria.feature.start <feature>\` | \`memoria feature start "<feature>"\` |
+| \`/memoria.feature.list\` | \`memoria feature list\` |
 | \`/memoria.feature.status <feature>\` | \`memoria feature status "<feature>"\` |
+| \`/memoria.feature.done <feature> <item>\` | \`memoria feature done "<feature>" "<item>"\` |
+| \`/memoria.feature.packet <feature>\` | \`memoria feature packet "<feature>"\` |
 | \`/memoria.feature.finish <feature>\` | \`memoria feature finish "<feature>"\` |
 | \`/memoria.ingest\` | \`memoria ingest\` |
 | \`/memoria.memory decision "<text>"\` | \`memoria memory add decision "<text>"\` |
@@ -455,6 +486,7 @@ When the user types \`/memoria.*\` commands, map them to Memoria CLI commands:
 | \`/memoria.search <query>\` | \`memoria search "<query>"\` |
 | \`/memoria.savings <task>\` | \`memoria savings "<task>"\` |
 | \`/memoria.doctor\` | \`memoria doctor\` |
+| \`/memoria.ask <question>\` | \`memoria ask "<question>"\` |
 
 ## How to Use Memoria with ${toolName}
 

@@ -179,7 +179,10 @@ init -> ingest -> feature start -> implement -> feature finish -> savings
 ```
 
 - `feature start` creates or refreshes the brief, path, checklist, and recall context.
+- `feature list` shows active Feature Memory Packets.
 - `feature status` shows checklist progress, related memory, and savings reports.
+- `feature done` marks checklist items complete by number or text.
+- `feature packet` prints the shareable Feature Memory Packet for an AI agent.
 - `feature finish` saves durable decisions, refreshes the index, and writes a savings report.
 - `ingest` indexes code, skills, briefs, and memories.
 - `recall` creates a token-budgeted context pack for Claude Code, Codex, Copilot Chat, Cursor, Continue, or another LLM agent.
@@ -302,7 +305,10 @@ memoria recall "getting started" --budget 8000
 |---------|----------|-----------|
 | `init` | New project or repo | Once |
 | `feature start` | Starting a feature with brief, path, checklist, and recall | Every feature |
+| `feature list` | Seeing active Feature Memory Packets | Daily |
 | `feature status` | Checking feature memory, checklist, and savings state | During feature work |
+| `feature done` | Marking checklist progress | During feature work |
+| `feature packet` | Printing a shareable packet for an AI agent | Before agent handoff |
 | `feature finish` | Saving final decisions, ingesting changes, and writing savings report | End of feature |
 | `brief create` | Starting new task/feature | Daily |
 | `memory add` | Made important decision | As needed |
@@ -353,7 +359,10 @@ Then use Memoria protocol commands inside your agent chat:
 ```text
 /memoria.brief add password reset
 /memoria.feature.start add password reset
+/memoria.feature.list
 /memoria.feature.status add password reset
+/memoria.feature.done add password reset 1
+/memoria.feature.packet add password reset
 /memoria.ingest
 /memoria.recall add password reset
 /memoria.feature.finish add password reset
@@ -372,10 +381,14 @@ Expected behavior by feature:
 | `/memoria.path <task>` | Runs `memoria brief path "<task>"` | A refreshed implementation-path section in the task brief |
 | `/memoria.checklist <task>` | Runs `memoria brief checklist "<task>"` | A refreshed checklist section in the task brief |
 | `/memoria.feature.start <feature>` | Runs `memoria feature start "<feature>"` | A Feature Memory Packet with brief, path, checklist, and recall context |
+| `/memoria.feature.list` | Runs `memoria feature list` | Active Feature Memory Packets and checklist progress |
 | `/memoria.feature.status <feature>` | Runs `memoria feature status "<feature>"` | Checklist, related memory, and savings status |
+| `/memoria.feature.done <feature> <item>` | Runs `memoria feature done "<feature>" "<item>"` | Checklist item marked complete by number or matching text |
+| `/memoria.feature.packet <feature>` | Runs `memoria feature packet "<feature>"` | Shareable Feature Memory Packet for an AI agent |
 | `/memoria.feature.finish <feature>` | Runs `memoria feature finish "<feature>"` | Refreshed index, saved savings report, and optional durable decision |
 | `/memoria.ingest` | Runs `memoria ingest` | Updated project index, embeddings, and knowledge graph data |
 | `/memoria.recall <task>` | Runs `memoria recall "<task>" --budget 4000 --explain` | Token-budgeted context with an explanation of why sections were included |
+| `/memoria.ask <question>` | Runs `memoria ask "<question>"` | LLM answer grounded in recalled Memoria context, with token/cache usage |
 | `/memoria.search <query>` | Runs `memoria search "<query>"` | Semantic matches from indexed code, skills, briefs, and memory |
 | `/memoria.savings <task>` | Runs `memoria savings "<task>" --baseline all-indexed --save` | A token and cost savings report saved under `.memoria/reports/savings/` |
 | `/memoria.memories <query>` | Runs `memoria memory search "<query>"` | Matching durable decisions, conventions, notes, and session records |
@@ -388,11 +401,12 @@ Expected behavior by feature:
 | Feature | What it does |
 | --- | --- |
 | **Token Budget Control** | Sets hard recall limits so prompts stay within budget |
+| **Context-Grounded Ask** | Answers questions with recalled context, optional LLM reranking, and cache usage stats |
 | **Savings Tracking** | Compares recalled context against full-index baselines and can save reports |
 | **Persistent Memory** | Reuses decisions, conventions, notes, and session handoff context |
 | **Smart Indexing** | Builds semantic search data and a lightweight knowledge graph from the project |
 | **Task Briefs** | Captures goals, implementation paths, and checklists in compact `.memoria/briefs/` files |
-| **Feature Memory Packets** | Combines feature brief, path, checklist, recall context, durable decisions, and savings report |
+| **Feature Memory Packets** | Combines feature brief, path, checklist progress, shareable packet output, durable decisions, and savings report |
 | **Workspace Doctor** | Checks Memoria setup, index files, agent instructions, and project memory counts |
 | **Agent Integration** | Generates guides, instructions, prompt files, command files, Codex skills, and `AGENTS.md` |
 | **Slash-Command Protocol** | Maps `/memoria.*` chat requests to real `memoria` CLI commands |

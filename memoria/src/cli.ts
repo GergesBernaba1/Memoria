@@ -8,12 +8,13 @@ import { runSearch } from "./commands/search.js";
 import { runRecall } from "./commands/recall.js";
 import { runSummarize } from "./commands/summarize.js";
 import { runCluster } from "./commands/cluster.js";
+import { runAsk } from "./commands/ask.js";
 import { briefChecklist, briefCreate, briefList, briefPath, briefShow } from "./commands/brief.js";
 import { memoryAdd, memoryDelete, memoryList, memorySearch, memoryShow, memoryUpdate } from "./commands/memory.js";
 import { runSavings } from "./commands/savings.js";
 import { agentInstall, isAgentTarget } from "./commands/agent.js";
 import { runDoctor } from "./commands/doctor.js";
-import { featureFinish, featureStart, featureStatus } from "./commands/feature.js";
+import { featureDone, featureFinish, featureList, featurePacket, featureStart, featureStatus } from "./commands/feature.js";
 import { logger } from "./utils/logger.js";
 
 const program = new Command();
@@ -271,6 +272,14 @@ agent
 
 const feature = program.command("feature").description("Manage Feature Memory Packets");
 feature
+  .command("list")
+  .description("List Feature Memory Packets")
+  .option("--json", "Output as JSON")
+  .action(async (opts: { json?: boolean }) => {
+    await featureList({ json: opts.json });
+  });
+
+feature
   .command("start <name>")
   .description("Create or refresh a feature brief, path, checklist, and recall context")
   .option("-d, --description <text>", "Short feature goal")
@@ -299,6 +308,22 @@ feature
   .option("--json", "Output as JSON")
   .action(async (name: string, opts: { json?: boolean }) => {
     await featureStatus(name, { json: opts.json });
+  });
+
+feature
+  .command("done <name> <item>")
+  .description("Mark a feature checklist item done by number or text")
+  .option("--json", "Output as JSON")
+  .action(async (name: string, item: string, opts: { json?: boolean }) => {
+    await featureDone(name, item, { json: opts.json });
+  });
+
+feature
+  .command("packet <name>")
+  .description("Print a shareable Feature Memory Packet")
+  .option("--json", "Output as JSON")
+  .action(async (name: string, opts: { json?: boolean }) => {
+    await featurePacket(name, { json: opts.json });
   });
 
 feature
@@ -380,6 +405,48 @@ program
         hops: opts.hops,
         budgetModel: opts.model,
         explain: opts.explain,
+        json: opts.json,
+      });
+    },
+  );
+
+program
+  .command("ask <query>")
+  .description("Ask an LLM using Memoria recalled context")
+  .option("-b, --budget <n>", "Recall token budget", (v) => parseInt(v, 10))
+  .option("-k, --top <n>", "Recall top-K", (v) => parseInt(v, 10))
+  .option("--hops <n>", "KG expansion hops", (v) => parseInt(v, 10))
+  .option("-m, --model <id>", "Answer model")
+  .option("-o, --output-tokens <n>", "Max output tokens", (v) => parseInt(v, 10))
+  .option("--temperature <n>", "Sampling temperature", (v) => Number.parseFloat(v))
+  .option("--no-cache", "Disable prompt cache hints")
+  .option("--rerank", "Enable LLM reranking for this ask")
+  .option("--no-rerank", "Disable LLM reranking for this ask")
+  .option("--json", "Output as JSON")
+  .action(
+    async (
+      query: string,
+      opts: {
+        budget?: number;
+        top?: number;
+        hops?: number;
+        model?: string;
+        outputTokens?: number;
+        temperature?: number;
+        cache?: boolean;
+        rerank?: boolean;
+        json?: boolean;
+      },
+    ) => {
+      await runAsk(query, {
+        budgetTokens: opts.budget,
+        topK: opts.top,
+        hops: opts.hops,
+        model: opts.model,
+        maxOutputTokens: opts.outputTokens,
+        temperature: opts.temperature,
+        cache: opts.cache,
+        rerank: opts.rerank,
         json: opts.json,
       });
     },

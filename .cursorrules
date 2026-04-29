@@ -1,0 +1,78 @@
+# Memoria Integration for Cursor
+
+This project uses **Memoria** - a context optimization tool for AI coding that saves tokens and money.
+
+## Quick Reference: Memoria Slash Commands
+
+When the user types `/memoria.*` commands, map them to Memoria CLI commands:
+
+| User Command | Run in Terminal |
+|--------------|-----------------|
+| `/memoria.recall <task>` | `memoria recall "<task>"` |
+| `/memoria.brief <task>` | `memoria brief create "<task>"` |
+| `/memoria.feature.start <feature>` | `memoria feature start "<feature>"` |
+| `/memoria.feature.list` | `memoria feature list` |
+| `/memoria.feature.status <feature>` | `memoria feature status "<feature>"` |
+| `/memoria.feature.done <feature> <item>` | `memoria feature done "<feature>" "<item>"` |
+| `/memoria.feature.packet <feature>` | `memoria feature packet "<feature>"` |
+| `/memoria.feature.finish <feature>` | `memoria feature finish "<feature>"` |
+| `/memoria.ingest` | `memoria ingest` |
+| `/memoria.memory decision "<text>"` | `memoria memory add decision "<text>"` |
+| `/memoria.memory note "<text>"` | `memoria memory add note "<text>"` |
+| `/memoria.memory convention "<text>"` | `memoria memory add convention "<text>"` |
+| `/memoria.search <query>` | `memoria search "<query>"` |
+| `/memoria.savings <task>` | `memoria savings "<task>"` |
+| `/memoria.doctor` | `memoria doctor` |
+| `/memoria.ask <question>` | `memoria ask "<question>"` |
+
+## How to Use Memoria with Cursor
+
+### Workflow
+
+1. **User types:** `/memoria.recall add user authentication`
+2. **You respond:** "Please run this command in your terminal:
+   ```bash
+   memoria recall "add user authentication"
+   ```
+   Then paste the output here and I'll help you implement it."
+3. **User pastes context** (optimized, token-budgeted)
+4. **You use that context** to help them code
+
+### Core Principle
+
+**Always prefer Memoria-optimized context over reading many files:**
+- Don't read 20+ files from the workspace when recall can provide focused context.
+- Ask the user to run `memoria recall "query"` and paste results when terminal access is unavailable.
+- Memoria gives you the RIGHT context within a token budget.
+
+### Example
+
+User: `/memoria.recall fix login bug`
+
+You: "I see you want to work on fixing a login bug. Please run:
+```bash
+memoria recall "fix login bug"
+```
+Then paste the output here so I have the optimized context."
+
+User: [pastes recalled context with relevant code, decisions, patterns]
+
+You: "Great! Based on this context, I can see the issue is in `src/auth/login.ts`..."
+
+## Why This Saves Money
+
+- **Without Memoria:** You might read 50,000 tokens of code
+- **With Memoria:** User gets 4,000 tokens of RELEVANT code
+- **Savings:** 46,000 tokens = ~$0.50-$1.50 per request
+
+## Memory Types
+
+When user saves learnings:
+- `decision` - Important choices made (e.g., "Use JWT for auth")
+- `convention` - Team standards (e.g., "Always use Zod validation")
+- `note` - General observations
+- `session` - Temporary context for current work
+
+## Full Command Reference
+
+See `.memoria/agents/cursor.md` for complete documentation.

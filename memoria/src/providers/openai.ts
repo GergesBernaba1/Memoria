@@ -28,9 +28,15 @@ export class OpenAIAdapter implements LLMProvider, EmbeddingProvider {
 
   async chat(opts: ChatOpts): Promise<ChatResult> {
     if (!this.client) throw new ProviderNotReadyError("openai", "OPENAI_API_KEY not set");
+    const messages = opts.systemBlocks && opts.systemBlocks.length > 0
+      ? [
+          ...opts.systemBlocks.map((content) => ({ role: "system" as const, content })),
+          ...opts.messages.filter((m) => m.role !== "system").map((m) => ({ role: m.role, content: m.content })),
+        ]
+      : opts.messages.map((m) => ({ role: m.role, content: m.content }));
     const resp = await this.client.chat.completions.create({
       model: opts.model,
-      messages: opts.messages.map((m) => ({ role: m.role, content: m.content })),
+      messages,
       max_tokens: opts.maxTokens,
       temperature: opts.temperature,
     });

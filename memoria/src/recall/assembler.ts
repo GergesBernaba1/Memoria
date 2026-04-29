@@ -2,12 +2,14 @@ import type { Config } from "../core/config.js";
 import type { MemoriaPaths } from "../core/paths.js";
 import { EmbeddingStore, type EmbeddingRecord } from "../embeddings/store.js";
 import { resolveEmbedder } from "../embeddings/provider.js";
+import { rerankWithLLM } from "../embeddings/rerank.js";
 import { hybridTopK, type ScoredRecord } from "../embeddings/search.js";
 import { KgStore } from "../kg/store.js";
 import { buildIndex, expand } from "../kg/traverse.js";
 import { SummaryStore } from "../summarize/store.js";
 import { countTokens } from "../tokens/counter.js";
 import type { Entity } from "../kg/types.js";
+import type { LLMProvider } from "../providers/types.js";
 
 export interface RecallOptions {
   query: string;
@@ -16,6 +18,11 @@ export interface RecallOptions {
   expandHops?: number;
   /** Tokenizer model id used for budgeting (default: config.defaultModel). */
   budgetModel?: string;
+  rerank?: {
+    provider: LLMProvider;
+    model: string;
+    topNToRerank?: number;
+  };
 }
 
 export interface RecallSection {
@@ -81,6 +88,14 @@ export async function assembleRecall(
   if (all.length > 0) {
     hits = hybridTopK(queryVec, all, k * 2, { queryText: opts.query });
     hits = dedupeHits(hits).slice(0, k);
+    if (opts.rerank) {
+      hits = await rerankWithLLM(hits, {
+        query: opts.query,
+        provider: opts.rerank.provider,
+        model: opts.rerank.model,
+        topNToRerank: opts.rerank.topNToRerank,
+      });
+    }
   }
 
   // 3. KG expansion.

@@ -26,6 +26,7 @@ context to the model.
 - Start, inspect, and finish Feature Memory Packets with one command group.
 - Save durable decisions, conventions, and session notes as project memory.
 - Recall only the most relevant code, notes, briefs, and skills for the task.
+- Ask questions directly with `memoria ask`, using recalled context and cache-aware LLM calls.
 - Explain why context was selected so developers can audit the result.
 - Measure token savings instead of guessing.
 - Check setup health with `memoria doctor`.
@@ -39,21 +40,24 @@ context to the model.
 - Skill-MD files for reusable LLM instructions.
 - Knowledge graph and embeddings for code, skills, briefs, and memories.
 - Token-budgeted context assembly with explainable `memoria recall`.
+- Context-grounded answers with `memoria ask`, optional LLM reranking, and cache stats.
 - Hybrid semantic and keyword retrieval for more predictable matches.
 - Token counting, cost estimation, compression, and savings reports.
 
 ## Workflow
 
 ```text
-init -> ingest -> feature start -> implement -> feature finish -> savings
+init -> ingest -> feature start -> implement -> feature done -> feature packet -> feature finish
 ```
 
 1. `init` creates the `.memoria/` workspace.
 2. `ingest` indexes code, briefs, skills, and memories.
 3. `feature start` creates a Feature Memory Packet and recall context.
-4. `feature status` shows progress while work is active.
-5. `feature finish` records durable decisions, refreshes the index, and saves a savings report.
-6. `recall` remains available for direct token-budgeted context assembly.
+4. `feature list` and `feature status` show active work and progress.
+5. `feature done` marks checklist progress.
+6. `feature packet` prints a shareable packet for an AI agent.
+7. `feature finish` records durable decisions, refreshes the index, and saves a savings report.
+8. `recall` remains available for direct token-budgeted context assembly.
 
 ## Install
 
@@ -85,6 +89,7 @@ memoria memory add decision "Use short-lived access tokens and rotating refresh 
 # Index and retrieve context directly when needed
 memoria ingest
 memoria recall "auth refresh tokens" --budget 4000
+memoria ask "Where should refresh token rotation be implemented?"
 
 # Finish with durable memory and savings
 memoria feature finish "auth refresh tokens" --decision "Use short-lived access tokens and rotating refresh tokens."
@@ -162,6 +167,8 @@ memoria recall "build initial app" --budget 3000
 
 ```bash
 memoria feature start "add password reset" -d "Add password reset using existing auth patterns."
+memoria feature done "add password reset" "1"
+memoria feature packet "add password reset"
 memoria feature status "add password reset"
 ```
 
@@ -211,7 +218,10 @@ Example slash commands for the AI tool:
 ```text
 /memoria.brief add password reset
 /memoria.feature.start add password reset
+/memoria.feature.list
 /memoria.feature.status add password reset
+/memoria.feature.done add password reset 1
+/memoria.feature.packet add password reset
 /memoria.memory decision Password reset tokens expire after 15 minutes
 /memoria.ingest
 /memoria.recall add password reset
@@ -225,7 +235,10 @@ The generated guide tells the agent to translate those into commands like:
 ```bash
 memoria brief create "add password reset"
 memoria feature start "add password reset"
+memoria feature list
 memoria feature status "add password reset"
+memoria feature done "add password reset" "1"
+memoria feature packet "add password reset"
 memoria memory add decision "Password reset tokens expire after 15 minutes"
 memoria ingest
 memoria recall "add password reset" --budget 4000 --explain
@@ -264,7 +277,10 @@ Task:
 - `memoria brief checklist <name>` - refresh the checklist section.
 - `memoria brief list|show` - inspect briefs.
 - `memoria feature start <name>` - create or refresh a Feature Memory Packet and recall context.
+- `memoria feature list` - list Feature Memory Packets.
 - `memoria feature status <name>` - show checklist, related memory, and savings state.
+- `memoria feature done <name> <item>` - mark a checklist item done by number or text.
+- `memoria feature packet <name>` - print a shareable Feature Memory Packet.
 - `memoria feature finish <name>` - save final memory, refresh index, and write a savings report.
 
 ### Memory
@@ -286,6 +302,8 @@ Task:
 - `memoria ingest [--no-embed] [--full]` - refresh KG and embeddings, including briefs and memories.
 - `memoria search <query>` - semantic search code, skills, briefs, and memories.
 - `memoria recall <query> --explain` - assemble token-budgeted context and show why sections were selected.
+- `memoria ask <query>` - ask an LLM using recalled Memoria context.
+- `memoria ask <query> --rerank` - rerank recalled candidates with a cheap LLM before answering.
 - `memoria summarize [target]` - summarize source files.
 - `memoria cluster` - cluster code embeddings.
 

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { readJson, writeJson, pathExists } from "../utils/fs.js";
 
-/** A single price entry: USD per 1 million tokens. */
 export const PriceSchema = z.object({
   inputPerMillion: z.number().nonnegative(),
   outputPerMillion: z.number().nonnegative(),
@@ -13,15 +12,10 @@ export const ConfigSchema = z.object({
   defaultModel: z.string().default("claude-sonnet-4-6"),
   exclude: z
     .array(z.string())
-    .default(["**/node_modules/**", "**/.git/**", "**/.memoria/**", "**/dist/**", "**/build/**"]),
+    .default(["**/node_modules/**", "**/.git/**", "**/dist/**", "**/build/**"]),
   include: z
     .array(z.string())
-    .default([
-      "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs",
-      "**/*.py", "**/*.go", "**/*.rs", "**/*.java", "**/*.kt",
-      "**/*.rb", "**/*.php", "**/*.cs", "**/*.cpp", "**/*.c", "**/*.h",
-      "**/*.md", "**/*.sh",
-    ]),
+    .default(["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"]),
   pricing: z.record(z.string(), PriceSchema).default({}),
   providers: z
     .object({
@@ -72,6 +66,45 @@ export const ConfigSchema = z.object({
       defaultBudgetTokens: z.number().int().positive().default(4000),
       topK: z.number().int().positive().default(8),
       expandHops: z.number().int().nonnegative().default(1),
+    })
+    .default({}),
+  /**
+   * v0.3 ask command: send a question to the configured LLM along with a
+   * recalled context bundle. Supports Anthropic prompt caching of the context
+   * span, plus an optional LLM reranker step before context assembly.
+   */
+  ask: z
+    .object({
+      /** LLM model used to answer questions. */
+      model: z.string().default("claude-sonnet-4-6"),
+      /** Output token cap for the answer. */
+      maxOutputTokens: z.number().int().positive().default(1024),
+      /** Sampling temperature. 0 favors determinism. */
+      temperature: z.number().min(0).max(2).default(0.2),
+      /**
+       * Prompt-caching settings. When enabled, Memoria marks the recalled
+       * context block with cache_control so repeat asks within ~5 minutes
+       * are billed at the cache-read rate.
+       */
+      cache: z
+        .object({
+          enabled: z.boolean().default(true),
+        })
+        .default({}),
+      /**
+       * Optional LLM reranker: after hybrid top-K retrieval, ask a cheap
+       * model to reorder the top N candidates by relevance. Disabled by
+       * default since it costs an extra round-trip.
+       */
+      rerank: z
+        .object({
+          enabled: z.boolean().default(false),
+          /** Model used for reranking; should be a cheap, fast model. */
+          model: z.string().default("claude-haiku-4-5"),
+          /** Max number of candidates to send to the reranker. */
+          topNToRerank: z.number().int().positive().default(16),
+        })
+        .default({}),
     })
     .default({}),
 });

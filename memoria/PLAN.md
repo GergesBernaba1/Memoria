@@ -18,7 +18,7 @@ reports.
 Memoria's product direction is memory-first, token-aware execution for AI coding agents:
 
 - Use a compact brief instead of long generated planning documents.
-- Provide Feature Memory Packet commands for start/status/finish.
+- Provide Feature Memory Packet commands for start/list/status/done/packet/finish.
 - Store reusable decisions and conventions as memory.
 - Ingest code, skills, briefs, and memories into embeddings.
 - Recall only the context needed for the task.
@@ -29,6 +29,8 @@ The core workflow is:
 ```bash
 memoria brief create "auth refresh tokens"
 memoria feature start "auth refresh tokens"
+memoria feature done "auth refresh tokens" "1"
+memoria feature packet "auth refresh tokens"
 memoria memory add decision "Use rotating refresh tokens."
 memoria ingest
 memoria recall "auth refresh tokens" --budget 4000
@@ -39,7 +41,7 @@ memoria feature finish "auth refresh tokens" --decision "Use rotating refresh to
 
 - Local-first memory stored as plain files under `.memoria/`.
 - Compact task briefs that avoid large generated planning documents.
-- Feature workflow commands for start/status/finish.
+- Feature workflow commands for start/list/status/done/packet/finish.
 - Durable memories for decisions, conventions, notes, and sessions.
 - Skill-MD files for reusable LLM instructions.
 - Semantic recall over code, skills, briefs, and memories.

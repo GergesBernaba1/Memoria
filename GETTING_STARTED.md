@@ -347,7 +347,10 @@ Savings:                  37,067 tokens → $0.56 (82%)
 | `memoria brief list` | List all briefs |
 | `memoria brief show <id>` | View a specific brief |
 | `memoria feature start <name>` | Create a Feature Memory Packet and recall context |
+| `memoria feature list` | List active Feature Memory Packets |
 | `memoria feature status <name>` | Show checklist, related memory, and savings state |
+| `memoria feature done <name> <item>` | Mark checklist progress |
+| `memoria feature packet <name>` | Print a shareable packet for an AI agent |
 | `memoria feature finish <name>` | Save final memory, refresh index, and write savings report |
 
 ### Memory Management
@@ -365,6 +368,8 @@ Savings:                  37,067 tokens → $0.56 (82%)
 | `memoria recall <query>` | Generate context (default 4000 token budget) |
 | `memoria recall <query> --budget 8000` | Custom token budget |
 | `memoria recall <query> --explain` | Show what was included and why |
+| `memoria ask <query>` | Ask an LLM using recalled context |
+| `memoria ask <query> --rerank` | Use LLM reranking before answering |
 | `memoria savings <query>` | Compare savings vs full context |
 
 ### Advanced Features
@@ -505,9 +510,13 @@ All tools understand these commands:
 | Command | What It Does |
 |---------|--------------|
 | `/memoria.recall <task>` | Generate optimized context |
+| `/memoria.ask <question>` | Ask with recalled Memoria context |
 | `/memoria.brief <task>` | Create a task brief |
 | `/memoria.feature.start <feature>` | Create a Feature Memory Packet |
+| `/memoria.feature.list` | List Feature Memory Packets |
 | `/memoria.feature.status <feature>` | Check feature memory status |
+| `/memoria.feature.done <feature> <item>` | Mark checklist progress |
+| `/memoria.feature.packet <feature>` | Print the feature packet |
 | `/memoria.feature.finish <feature>` | Finish feature with memory and savings |
 | `/memoria.ingest` | Re-index codebase |
 | `/memoria.memory decision "<text>"` | Save a decision |

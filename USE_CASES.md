@@ -15,7 +15,10 @@ brief + implementation path + checklist + recalled context + durable decisions +
 | Packet part | Command | Value |
 | --- | --- | --- |
 | Start packet | `memoria feature start "<feature>"` | Creates or refreshes the brief, path, checklist, and recall context |
+| List packets | `memoria feature list` | Shows active Feature Memory Packets |
 | Status | `memoria feature status "<feature>"` | Shows checklist progress, related memory, and savings reports |
+| Mark progress | `memoria feature done "<feature>" "1"` | Marks a checklist item done by number or text |
+| Share packet | `memoria feature packet "<feature>"` | Prints a packet ready to paste into an AI agent |
 | Finish packet | `memoria feature finish "<feature>" --decision "<text>"` | Saves durable memory, refreshes the index, and writes a savings report |
 | Direct recall | `memoria recall "<feature>" --budget 4000 --explain` | Gives the agent relevant context without the full repo |
 | Workspace check | `memoria doctor` | Verifies setup, index files, and agent instruction files |
@@ -68,7 +71,10 @@ memoria feature start "add password reset" -d "Add password reset email flow usi
 | Feature stage | Memoria command | User benefit |
 | --- | --- | --- |
 | Start feature | `memoria feature start` | Creates the Feature Memory Packet and recalls focused context |
+| List active work | `memoria feature list` | Shows current packets and checklist progress |
 | Check progress | `memoria feature status` | Shows checklist progress, related memory, and savings reports |
+| Mark progress | `memoria feature done` | Marks checklist items complete |
+| Share context | `memoria feature packet` | Prints the packet for an AI agent handoff |
 | Find context directly | `memoria recall` | Pulls related files, memory, briefs, and summaries into a token budget |
 | Save decisions | `memoria feature finish --decision` | Makes feature knowledge reusable in future work |
 | Measure value | `memoria feature finish` | Writes a savings report after implementation |
@@ -148,13 +154,16 @@ This gives them project conventions, architecture decisions, important files, an
 The practical loop is:
 
 ```text
-init -> ingest -> feature start -> implement -> feature finish -> savings
+init -> ingest -> feature start -> implement -> feature done -> feature packet -> feature finish
 ```
 
 | User need | Command | Result |
 | --- | --- | --- |
 | Start a task | `memoria feature start "<task>"` | Feature Memory Packet with brief, path, checklist, and recall |
+| List active tasks | `memoria feature list` | Active packets and checklist progress |
 | Check progress | `memoria feature status "<task>"` | Checklist, memory, and savings status |
+| Mark work done | `memoria feature done "<task>" "1"` | Checklist item marked complete |
+| Share with AI | `memoria feature packet "<task>"` | Paste-ready feature packet |
 | Refresh the index | `memoria ingest` | Current project context |
 | Ask AI for help | `memoria recall "<task>" --budget 4000 --explain` | Relevant context pack |
 | Preserve knowledge | `memoria feature finish "<task>" --decision "<text>"` | Durable project memory and refreshed index |

@@ -134,13 +134,13 @@ async function requireBriefFile(briefsDir: string, name: string): Promise<string
 
 function replaceSection(source: string, title: string, body: string): string {
   const section = `## ${title}\n\n${body.trim()}\n`;
-  const pattern = new RegExp(`(^## ${escapeRegExp(title)}\\s*\\n)[\\s\\S]*?(?=\\n## |$)`, "m");
+  const pattern = new RegExp(`((?:^|\\n)## ${escapeRegExp(title)}\\s*\\n)[\\s\\S]*?(?=\\n## |$)`);
   if (!pattern.test(source)) return `${source.trim()}\n\n${section}`;
-  return source.replace(pattern, section);
+  return source.replace(pattern, (match) => (match.startsWith("\n") ? `\n${section}` : section));
 }
 
 function extractSection(source: string, title: string): string | null {
-  const pattern = new RegExp(`(^## ${escapeRegExp(title)}\\s*\\n[\\s\\S]*?)(?=\\n## |$)`, "m");
+  const pattern = new RegExp(`(?:^|\\n)(## ${escapeRegExp(title)}\\s*\\n[\\s\\S]*?)(?=\\n## |$)`);
   return source.match(pattern)?.[1]?.trim() ?? null;
 }
 

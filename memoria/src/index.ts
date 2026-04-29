@@ -7,13 +7,18 @@ export { configGet, configSet } from "./commands/config.js";
 export { briefChecklist, briefCreate, briefList, briefPath, briefShow } from "./commands/brief.js";
 export { memoryAdd, memoryDelete, memoryList, memorySearch, memoryShow, memoryUpdate } from "./commands/memory.js";
 export { runSavings, type SavingsOptions, type SavingsReport } from "./commands/savings.js";
+export { runAsk, type AskOptions, type AskResult } from "./commands/ask.js";
 export { agentInstall, isAgentTarget, type AgentInstallOptions, type AgentTarget } from "./commands/agent.js";
 export { runDoctor, type DoctorReport } from "./commands/doctor.js";
 export {
+  featureDone,
   featureFinish,
+  featureList,
+  featurePacket,
   featureStart,
   featureStatus,
   type FeatureFinishOptions,
+  type FeatureListItem,
   type FeatureStartOptions,
   type FeatureStatus,
 } from "./commands/feature.js";
@@ -132,6 +137,11 @@ export {
   type KmeansOptions,
   type KmeansResult,
 } from "./cluster/kmeans.js";
+export {
+  parseOrder,
+  rerankWithLLM,
+  type RerankOptions,
+} from "./embeddings/rerank.js";
 export {
   assembleRecall,
   type RecallOptions,
