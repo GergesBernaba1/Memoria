@@ -375,6 +375,169 @@ Savings:                  37,067 tokens → $0.56 (82%)
 
 ---
 
+## AI Agent Integration
+
+Memoria works with **all major AI coding tools** by creating auto-loaded instruction files!
+
+### One Command, Works Everywhere
+
+```bash
+# Install agent guides for all tools at once
+memoria agent install all
+```
+
+**What this creates:**
+
+| File | Tool | Auto-Loaded? |
+|------|------|--------------|
+| `.github/copilot-instructions.md` | GitHub Copilot | ✅ Yes |
+| `.cursorrules` | Cursor | ✅ Yes |
+| `.claude/instructions.md` | Claude Code | ⚠️ Maybe |
+| `.windsurfrules` | Windsurf | ✅ Yes |
+| `.memoria/agents/*.md` | All tools | Manual reference |
+
+### Install for Specific Tools
+
+```bash
+# Just GitHub Copilot
+memoria agent install copilot
+
+# Just Cursor
+memoria agent install cursor
+
+# Just Claude Code
+memoria agent install claude
+```
+
+---
+
+### Using with GitHub Copilot
+
+After running `memoria agent install all` or `copilot`, GitHub Copilot **automatically** knows about Memoria!
+
+**In Copilot Chat:**
+```
+/memoria.recall add user authentication
+```
+
+**Copilot responds:**
+```
+Please run this command in your terminal:
+
+memoria recall "add user authentication"
+
+Then paste the output here and I'll help you.
+```
+
+---
+
+### Using with Cursor
+
+After running `memoria agent install all` or `cursor`, Cursor **automatically** reads `.cursorrules`!
+
+**In Cursor Chat:**
+```
+/memoria.recall add stripe payment
+```
+
+**Cursor responds:**
+```
+I see you want Memoria context. Please run:
+
+memoria recall "add stripe payment"
+
+Then paste the optimized context here.
+```
+
+---
+
+### Using with Claude Code
+
+After running `memoria agent install claude`:
+
+**In Claude Code:**
+```
+@workspace Read .claude/instructions.md
+
+/memoria.recall fix login bug
+```
+
+**Claude responds:**
+```
+I'll help you with the login bug. First, run:
+
+memoria recall "fix login bug"
+
+Then paste the context.
+```
+
+---
+
+### Using with Codex or Other Tools
+
+For any other AI tool:
+
+**Option 1: Reference the guide**
+```
+@workspace Read .memoria/agents/generic.md
+
+/memoria.recall my task
+```
+
+**Option 2: Direct workflow (simpler)**
+```
+I'm using Memoria for context. Please ask me to run:
+memoria recall "my task"
+
+Then I'll paste the optimized context.
+```
+
+---
+
+### Available Slash Commands
+
+All tools understand these commands:
+
+| Command | What It Does |
+|---------|--------------|
+| `/memoria.recall <task>` | Generate optimized context |
+| `/memoria.brief <task>` | Create a task brief |
+| `/memoria.ingest` | Re-index codebase |
+| `/memoria.memory decision "<text>"` | Save a decision |
+| `/memoria.memory convention "<text>"` | Save a convention |
+| `/memoria.memory note "<text>"` | Save a note |
+| `/memoria.savings <task>` | Check token savings |
+
+**Important:** These are shortcuts the AI understands. You still run the actual `memoria` commands in your terminal and paste results back.
+
+---
+
+### Complete Workflow Example
+
+```bash
+# 1. Setup (one time)
+cd your-project
+memoria init
+memoria ingest
+memoria agent install all  # Creates files for ALL tools
+
+# 2. Commit to git (team gets these too!)
+git add .memoria/ .github/ .cursorrules .claude/ .windsurfrules
+git commit -m "Add Memoria with AI tool integration"
+
+# 3. Use in any AI tool
+# In Copilot/Cursor/Claude chat:
+/memoria.recall add user authentication
+
+# 4. Run suggested command
+memoria recall "add user authentication"
+
+# 5. Paste output back to AI
+# 6. Code with AI using optimized context!
+```
+
+---
+
 ## Real-World Examples
 
 ### Example 1: Bug Fix

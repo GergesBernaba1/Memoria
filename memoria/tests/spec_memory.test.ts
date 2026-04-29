@@ -82,7 +82,7 @@ describe("workflow commands", () => {
     const files = await agentInstall("all", { cwd: dir });
     const paths = memoriaPathsFor(dir);
 
-    expect(files).toHaveLength(5);
+    expect(files).toHaveLength(29);
     await expect(fs.readFile(path.join(paths.agentsDir, "README.md"), "utf8")).resolves.toContain(
       "Memoria Agent Guides",
     );
@@ -91,6 +91,15 @@ describe("workflow commands", () => {
     );
     await expect(fs.readFile(path.join(paths.agentsDir, "codex.md"), "utf8")).resolves.toContain(
       'memoria recall "<task>" --budget 4000 --explain',
+    );
+    await expect(fs.readFile(path.join(dir, ".claude", "commands", "memoria.recall.md"), "utf8")).resolves.toContain(
+      'memoria recall "$ARGUMENTS" --budget 4000 --explain',
+    );
+    await expect(fs.readFile(path.join(dir, ".github", "prompts", "memoria.recall.prompt.md"), "utf8")).resolves.toContain(
+      'memoria recall "<arguments>" --budget 4000 --explain',
+    );
+    await expect(fs.readFile(path.join(dir, "AGENTS.md"), "utf8")).resolves.toContain(
+      "Codex currently exposes built-in slash commands and skills",
     );
   });
 });

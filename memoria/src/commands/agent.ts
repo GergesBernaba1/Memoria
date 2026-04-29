@@ -12,6 +12,70 @@ export interface AgentInstallOptions {
 
 const TARGETS: AgentTarget[] = ["generic", "claude", "codex", "copilot", "cursor"];
 
+interface MemoriaCommand {
+  name: string;
+  args: string;
+  description: string;
+  cli: string;
+}
+
+const COMMANDS: MemoriaCommand[] = [
+  {
+    name: "memoria.init",
+    args: "",
+    description: "Initialize Memoria in this workspace.",
+    cli: "memoria init",
+  },
+  {
+    name: "memoria.brief",
+    args: "<task>",
+    description: "Create a compact Memoria task brief.",
+    cli: 'memoria brief create "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.path",
+    args: "<task>",
+    description: "Refresh the implementation path for a Memoria brief.",
+    cli: 'memoria brief path "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.checklist",
+    args: "<task>",
+    description: "Refresh the checklist for a Memoria brief.",
+    cli: 'memoria brief checklist "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.ingest",
+    args: "",
+    description: "Refresh Memoria's code graph and embeddings.",
+    cli: "memoria ingest",
+  },
+  {
+    name: "memoria.recall",
+    args: "<task>",
+    description: "Recall token-budgeted Memoria context for a task.",
+    cli: 'memoria recall "$ARGUMENTS" --budget 4000 --explain',
+  },
+  {
+    name: "memoria.search",
+    args: "<query>",
+    description: "Search Memoria code, skills, briefs, and memory.",
+    cli: 'memoria search "$ARGUMENTS"',
+  },
+  {
+    name: "memoria.savings",
+    args: "<task>",
+    description: "Estimate token savings from Memoria recall.",
+    cli: 'memoria savings "$ARGUMENTS" --baseline all-indexed --save',
+  },
+  {
+    name: "memoria.memories",
+    args: "<query>",
+    description: "Search durable Memoria memory records.",
+    cli: 'memoria memory search "$ARGUMENTS"',
+  },
+];
+
 export async function agentInstall(
   target: AgentTarget | "all",
   opts: AgentInstallOptions = {},
@@ -30,6 +94,78 @@ export async function agentInstall(
 
   const index = path.join(ws.paths.agentsDir, "README.md");
   await writeText(index, agentsReadme());
+
+  // Create tool-specific instruction files that get auto-loaded
+  const projectRoot = path.join(ws.paths.root, "..");
+  
+  if (target === "all" || target === "copilot") {
+    // GitHub Copilot reads .github/copilot-instructions.md
+    const githubDir = path.join(projectRoot, ".github");
+    await ensureDir(githubDir);
+    const copilotInstructions = path.join(githubDir, "copilot-instructions.md");
+    await writeText(copilotInstructions, getInstructionsFile("copilot"));
+    written.push(copilotInstructions);
+    logger.success(`Created .github/copilot-instructions.md (auto-loaded by Copilot)`);
+
+    const promptsDir = path.join(githubDir, "prompts");
+    await ensureDir(promptsDir);
+    for (const command of COMMANDS) {
+      const promptFile = path.join(promptsDir, `${command.name}.prompt.md`);
+      await writeText(promptFile, copilotPrompt(command));
+      written.push(promptFile);
+    }
+    logger.success(`Created GitHub Copilot prompt files in .github/prompts/`);
+  }
+
+  if (target === "all" || target === "cursor") {
+    // Cursor reads .cursorrules
+    const cursorRules = path.join(projectRoot, ".cursorrules");
+    await writeText(cursorRules, getInstructionsFile("cursor"));
+    written.push(cursorRules);
+    logger.success(`Created .cursorrules (auto-loaded by Cursor)`);
+  }
+
+  if (target === "all" || target === "claude") {
+    // Claude Code reads project commands from .claude/commands/.
+    const claudeDir = path.join(projectRoot, ".claude");
+    await ensureDir(claudeDir);
+    const claudeInstructions = path.join(claudeDir, "instructions.md");
+    await writeText(claudeInstructions, getInstructionsFile("claude"));
+    written.push(claudeInstructions);
+    logger.success(`Created .claude/instructions.md (may be auto-loaded by Claude Code)`);
+
+    const commandsDir = path.join(claudeDir, "commands");
+    await ensureDir(commandsDir);
+    for (const command of COMMANDS) {
+      const commandFile = path.join(commandsDir, `${command.name}.md`);
+      await writeText(commandFile, claudeCommand(command));
+      written.push(commandFile);
+    }
+    logger.success(`Created Claude Code slash commands in .claude/commands/`);
+  }
+
+  if (target === "all" || target === "codex") {
+    const agentsFile = path.join(projectRoot, "AGENTS.md");
+    await writeText(agentsFile, codexAgentsFile());
+    written.push(agentsFile);
+    logger.success(`Created AGENTS.md (auto-loaded by Codex)`);
+
+    const codexSkillDir = path.join(projectRoot, ".agents", "skills", "memoria");
+    await ensureDir(codexSkillDir);
+    const codexSkillFile = path.join(codexSkillDir, "SKILL.md");
+    await writeText(codexSkillFile, codexSkill());
+    written.push(codexSkillFile);
+    logger.success(`Created Codex Memoria skill at .agents/skills/memoria/SKILL.md`);
+  }
+
+  if (target === "all") {
+    // Windsurf reads .windsurfrules
+    const windsurfRules = path.join(projectRoot, ".windsurfrules");
+    await writeText(windsurfRules, getInstructionsFile("generic"));
+    written.push(windsurfRules);
+    logger.success(`Created .windsurfrules (auto-loaded by Windsurf)`);
+  }
+
   return written;
 }
 
@@ -40,18 +176,44 @@ export function isAgentTarget(value: string): value is AgentTarget | "all" {
 function agentsReadme(): string {
   return `# Memoria Agent Guides
 
-These files teach AI coding tools how to interpret Memoria slash commands.
+These files teach AI coding tools how to interpret Memoria commands.
 
-Use them by attaching, pasting, or referencing the guide for your tool:
+## Agent Guide Files (Manual Reference)
 
-- \`generic.md\` - works with any LLM coding assistant.
-- \`claude.md\` - Claude Code oriented instructions.
-- \`codex.md\` - Codex oriented instructions.
-- \`copilot.md\` - GitHub Copilot Chat oriented instructions.
-- \`cursor.md\` - Cursor oriented instructions.
+These detailed guides are in \`.memoria/agents/\`:
 
-The slash commands are a protocol. The AI tool should translate them into the
-real \`memoria\` CLI commands listed in each guide.
+- \`generic.md\` - works with any LLM coding assistant
+- \`claude.md\` - Claude Code oriented instructions
+- \`codex.md\` - Codex oriented instructions
+- \`copilot.md\` - GitHub Copilot Chat oriented instructions
+- \`cursor.md\` - Cursor oriented instructions
+
+## Auto-Loaded Instruction Files
+
+These files are automatically read by each tool on startup where supported:
+
+- \`.github/copilot-instructions.md\` - **Auto-loaded by GitHub Copilot**
+- \`.cursorrules\` - **Auto-loaded by Cursor**
+- \`.claude/instructions.md\` - Auto-loaded by Claude Code (may vary)
+- \`.windsurfrules\` - **Auto-loaded by Windsurf**
+- \`AGENTS.md\` - **Auto-loaded by Codex**
+
+## Real Command Files
+
+For tools with reusable prompt or command discovery, Memoria also creates:
+
+- \`.claude/commands/memoria.recall.md\` and related files for Claude Code.
+- \`.github/prompts/memoria.recall.prompt.md\` and related files for GitHub Copilot prompt files.
+- \`.agents/skills/memoria/SKILL.md\` for Codex. Codex uses skills and built-in slash commands; repo-level custom \`/memoria.*\` slash commands are not currently a stable Codex feature.
+
+## How It Works
+
+1. User runs: \`memoria agent install all\`
+2. Memoria creates detailed guides, instruction files, and supported command/prompt files.
+3. AI tools either show real commands or learn to translate Memoria requests into CLI calls.
+
+The slash commands are a protocol. The AI tool translates them into the
+real \`memoria\` CLI commands and asks the user to run them.
 `;
 }
 
@@ -145,4 +307,172 @@ function labelFor(target: AgentTarget): string {
     case "generic":
       return "Generic AI Agents";
   }
+}
+
+function commandUsage(command: MemoriaCommand): string {
+  return `/${command.name}${command.args ? ` ${command.args}` : ""}`;
+}
+
+function cliForPrompt(command: MemoriaCommand): string {
+  return command.cli.replaceAll("$ARGUMENTS", "<arguments>");
+}
+
+function claudeCommand(command: MemoriaCommand): string {
+  return `---
+description: ${command.description}
+allowed-tools: Bash(memoria:*)
+---
+
+# ${command.name}
+
+The user invoked \`${commandUsage(command)}\`.
+
+Run this command from the workspace root:
+
+\`\`\`bash
+${command.cli}
+\`\`\`
+
+Use the command output as the source of truth for the next response. If the command fails because Memoria is not installed or initialized, report the exact failure and suggest the next \`memoria\` command to run.
+`;
+}
+
+function copilotPrompt(command: MemoriaCommand): string {
+  return `---
+description: ${command.description}
+mode: agent
+tools: ["codebase", "terminal"]
+---
+
+# ${command.name}
+
+The user invoked \`${commandUsage(command)}\`.
+
+Run this command in the workspace terminal:
+
+\`\`\`bash
+${cliForPrompt(command)}
+\`\`\`
+
+Use the Memoria output as the source of truth. If terminal execution is unavailable, tell the user the exact command to run and ask them to paste the output.
+`;
+}
+
+function codexAgentsFile(): string {
+  return `# Memoria
+
+This project uses Memoria for local-first project memory and token-budgeted recall.
+
+When the user writes a \`/memoria.*\` request, treat it as a Memoria protocol command and run the matching CLI command when shell access is available:
+
+| User request | CLI command |
+| --- | --- |
+${COMMANDS.map((command) => `| \`${commandUsage(command)}\` | \`${cliForPrompt(command)}\` |`).join("\n")}
+
+Prefer \`memoria recall "<task>" --budget 4000 --explain\` before broad source reads. Store durable decisions with \`memoria memory add decision "<text>"\`.
+
+Codex currently exposes built-in slash commands and skills. This file teaches Codex how to respond to \`/memoria.*\` text, while \`.agents/skills/memoria/SKILL.md\` exposes the same workflow as a project skill.
+`;
+}
+
+function codexSkill(): string {
+  return `---
+name: memoria
+description: Use Memoria recall, search, briefs, and durable memory before broad project exploration.
+---
+
+# Memoria
+
+Use this skill when the user asks for Memoria context, writes \`/memoria.*\`, wants project memory recalled, or asks to save a durable decision.
+
+## Commands
+
+| User request | CLI command |
+| --- | --- |
+${COMMANDS.map((command) => `| \`${commandUsage(command)}\` | \`${cliForPrompt(command)}\` |`).join("\n")}
+
+## Workflow
+
+1. For implementation tasks, run \`memoria recall "<task>" --budget 4000 --explain\` before broad file reads.
+2. Use recalled context as the starting source of truth.
+3. Run \`memoria ingest\` after meaningful code or memory changes.
+4. Save durable decisions with \`memoria memory add decision "<text>"\`.
+5. Do not store secrets, API keys, credentials, or private tokens in Memoria memory.
+`;
+}
+
+function getInstructionsFile(tool: AgentTarget | "generic"): string {
+  const toolName = labelFor(tool as AgentTarget);
+  
+  return `# Memoria Integration for ${toolName}
+
+This project uses **Memoria** - a context optimization tool for AI coding that saves tokens and money.
+
+## Quick Reference: Memoria Slash Commands
+
+When the user types \`/memoria.*\` commands, map them to Memoria CLI commands:
+
+| User Command | Run in Terminal |
+|--------------|-----------------|
+| \`/memoria.recall <task>\` | \`memoria recall "<task>"\` |
+| \`/memoria.brief <task>\` | \`memoria brief create "<task>"\` |
+| \`/memoria.ingest\` | \`memoria ingest\` |
+| \`/memoria.memory decision "<text>"\` | \`memoria memory add decision "<text>"\` |
+| \`/memoria.memory note "<text>"\` | \`memoria memory add note "<text>"\` |
+| \`/memoria.memory convention "<text>"\` | \`memoria memory add convention "<text>"\` |
+| \`/memoria.search <query>\` | \`memoria search "<query>"\` |
+| \`/memoria.savings <task>\` | \`memoria savings "<task>"\` |
+
+## How to Use Memoria with ${toolName}
+
+### Workflow
+
+1. **User types:** \`/memoria.recall add user authentication\`
+2. **You respond:** "Please run this command in your terminal:
+   \`\`\`bash
+   memoria recall "add user authentication"
+   \`\`\`
+   Then paste the output here and I'll help you implement it."
+3. **User pastes context** (optimized, token-budgeted)
+4. **You use that context** to help them code
+
+### Core Principle
+
+**Always prefer Memoria-optimized context over reading many files:**
+- Don't read 20+ files from the workspace when recall can provide focused context.
+- Ask the user to run \`memoria recall "query"\` and paste results when terminal access is unavailable.
+- Memoria gives you the RIGHT context within a token budget.
+
+### Example
+
+User: \`/memoria.recall fix login bug\`
+
+You: "I see you want to work on fixing a login bug. Please run:
+\`\`\`bash
+memoria recall "fix login bug"
+\`\`\`
+Then paste the output here so I have the optimized context."
+
+User: [pastes recalled context with relevant code, decisions, patterns]
+
+You: "Great! Based on this context, I can see the issue is in \`src/auth/login.ts\`..."
+
+## Why This Saves Money
+
+- **Without Memoria:** You might read 50,000 tokens of code
+- **With Memoria:** User gets 4,000 tokens of RELEVANT code
+- **Savings:** 46,000 tokens = ~$0.50-$1.50 per request
+
+## Memory Types
+
+When user saves learnings:
+- \`decision\` - Important choices made (e.g., "Use JWT for auth")
+- \`convention\` - Team standards (e.g., "Always use Zod validation")
+- \`note\` - General observations
+- \`session\` - Temporary context for current work
+
+## Full Command Reference
+
+See \`.memoria/agents/${tool}.md\` for complete documentation.
+`;
 }

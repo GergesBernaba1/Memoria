@@ -279,44 +279,70 @@ memoria recall "getting started" --budget 8000
 
 ## Works With Any AI Agent
 
-Memoria integrates with **Cursor, Claude Code, Copilot, Continue, Windsurf, Aider**, and any LLM coding tool.
+Memoria integrates with **Cursor, Claude Code, GitHub Copilot, Codex, Windsurf, Continue, Aider**, and any LLM coding tool.
 
-### Agent Slash Commands
+### Agent Integration
 
-Memoria can generate guide files that teach AI tools to use Memoria commands:
+Memoria can generate guide files, auto-loaded instruction files, and tool-specific command or prompt files that teach AI coding tools how to translate `/memoria.*` requests into real CLI commands:
 
 ```bash
 memoria agent install all
 ```
 
-Then use inside your agent chat:
+| Generated file | Tool | What it enables |
+| --- | --- | --- |
+| `.memoria/agents/*.md` | Any AI coding tool | Manual reference guides for Memoria workflow |
+| `.github/copilot-instructions.md` | GitHub Copilot | Auto-loaded project instructions |
+| `.github/prompts/memoria.*.prompt.md` | GitHub Copilot | Reusable prompt files for Memoria commands |
+| `.cursorrules` | Cursor | Auto-loaded Cursor instructions |
+| `.claude/instructions.md` | Claude Code | Project instructions where supported |
+| `.claude/commands/memoria.*.md` | Claude Code | Real slash-command files that run Memoria CLI commands |
+| `AGENTS.md` | Codex | Auto-loaded project instructions for `/memoria.*` protocol commands |
+| `.agents/skills/memoria/SKILL.md` | Codex | Memoria skill for recall, search, briefs, and durable memory |
+| `.windsurfrules` | Windsurf | Auto-loaded Windsurf instructions |
+
+Install only one target when you do not need all generated files:
+
+```bash
+memoria agent install copilot
+memoria agent install cursor
+memoria agent install claude
+memoria agent install codex
+memoria agent install generic
+```
+
+Then use Memoria protocol commands inside your agent chat:
 
 ```text
 /memoria.brief add password reset
-/memoria.memory decision Password reset tokens expire after 15 minutes
 /memoria.ingest
 /memoria.recall add password reset
 /memoria.savings add password reset
 ```
 
+The agent maps those requests to CLI commands such as `memoria recall "add password reset" --budget 4000 --explain`, runs them when shell access is available, and uses the returned context as the source of truth.
+
 ---
 
 ## Key Features
 
-- ✅ **Token Budget Control**: Set hard limits, never overspend
-- ✅ **Savings Tracking**: See exactly how much you save per request
-- ✅ **Persistent Memory**: Reuse decisions, conventions, patterns
-- ✅ **Smart Indexing**: Semantic search + knowledge graphs
-- ✅ **Agent Agnostic**: Works with any LLM coding tool
-- ✅ **Fast**: TypeScript/Node.js for sub-second recalls
-- ✅ **Type Safe**: Full TypeScript for reliability
+| Feature | What it does |
+| --- | --- |
+| **Token Budget Control** | Sets hard recall limits so prompts stay within budget |
+| **Savings Tracking** | Compares recalled context against full-index baselines and can save reports |
+| **Persistent Memory** | Reuses decisions, conventions, notes, and session handoff context |
+| **Smart Indexing** | Builds semantic search data and a lightweight knowledge graph from the project |
+| **Task Briefs** | Captures goals, implementation paths, and checklists in compact `.memoria/briefs/` files |
+| **Agent Integration** | Generates guides, instructions, prompt files, command files, Codex skills, and `AGENTS.md` |
+| **Slash-Command Protocol** | Maps `/memoria.*` chat requests to real `memoria` CLI commands |
+| **Agent Agnostic** | Works with Codex, Claude Code, Copilot, Cursor, Windsurf, Continue, Aider, and generic tools |
+| **Fast TypeScript CLI** | Provides a type-safe Node.js CLI for local-first workflows |
 
 ---
 
 ## Documentation
 
 - **[Getting Started Guide](GETTING_STARTED.md)** - Complete installation and usage tutorial
-- **[Publishing Guide](PUBLISHING.md)** - How to publish new versions
 - **[Full CLI Reference](memoria/README.md)** - All commands and options
 - **[Roadmap & Plan](memoria/PLAN.md)** - Future features and architecture
 
