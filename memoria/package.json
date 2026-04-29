@@ -1,5 +1,5 @@
 {
-  "name": "memoria",
+  "name": "memoria-kit",
   "version": "0.2.0",
   "description": "Contextual Memory and Prompt Optimization Toolkit for LLM-powered development",
   "type": "module",
@@ -30,10 +30,25 @@
     "tokens",
     "skills",
     "claude",
-    "openai"
+    "openai",
+    "ai",
+    "context",
+    "embeddings",
+    "semantic-search",
+    "copilot",
+    "cursor"
   ],
-  "author": "",
+  "author": "GergesBernaba1",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GergesBernaba1/Memoria.git",
+    "directory": "memoria"
+  },
+  "bugs": {
+    "url": "https://github.com/GergesBernaba1/Memoria/issues"
+  },
+  "homepage": "https://github.com/GergesBernaba1/Memoria#readme",
   "engines": {
     "node": ">=20"
   },

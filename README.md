@@ -9,10 +9,34 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <a href="https://www.npmjs.com/package/memoria-kit"><img alt="npm version" src="https://img.shields.io/npm/v/memoria-kit.svg" /></a>
   <a href="https://nodejs.org"><img alt="Node.js >=20" src="https://img.shields.io/badge/node-%3E%3D20-339933.svg" /></a>
   <img alt="CLI first" src="https://img.shields.io/badge/workflow-CLI%20first-111827.svg" />
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/GergesBernaba1/Memoria?style=social" />
 </p>
+
+---
+
+## Quick Start
+
+```bash
+# Install
+npm install -g memoria-kit
+
+# Initialize in your project
+cd your-project
+memoria init
+
+# Index your codebase
+memoria ingest
+
+# Generate optimized context for your AI assistant
+memoria recall "add authentication" --budget 6000
+```
+
+**Copy the output to Copilot, Cursor, ChatGPT, or any AI tool. Save 60-80% on tokens!**
+
+See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed instructions.
 
 ---
 
