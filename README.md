@@ -36,6 +36,58 @@ memoria recall "add authentication" --budget 6000
 
 **Copy the output to Copilot, Cursor, ChatGPT, or any AI tool. Save 60-80% on tokens!**
 
+---
+
+## Getting Started
+
+### Installation
+
+```bash
+npm install -g memoria-kit
+```
+
+Verify it's installed:
+```bash
+memoria --version
+```
+
+### Your First Workflow
+
+**1. Initialize in your project:**
+```bash
+cd your-project
+memoria init --name "My Project"
+```
+
+This creates a `.memoria/` folder with configuration.
+
+**2. Index your codebase:**
+```bash
+memoria ingest
+```
+
+This creates embeddings and a knowledge graph of your code. Takes 1-5 minutes depending on project size.
+
+**3. Generate optimized context:**
+```bash
+memoria recall "add user authentication" --budget 6000 --explain
+```
+
+**4. Use with your AI assistant:**
+- Copy the output
+- Paste into GitHub Copilot Chat, Cursor, Claude, or ChatGPT
+- Add your question or request
+
+**5. Save what you learn:**
+```bash
+memoria memory add decision "Use JWT tokens for auth" -t authentication
+```
+
+**6. Check your savings:**
+```bash
+memoria savings "authentication implementation"
+```
+
 See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed instructions.
 
 ---
@@ -223,43 +275,33 @@ memoria recall "getting started" --budget 8000
 | `savings` | Want to track ROI | Daily/Weekly |
 | `agent install` | Setup new AI tool | Once per tool |
 
-## Quickstart
+---
 
-Install and see your first savings in under 5 minutes:
-
-```bash
-# Install
-cd memoria
-npm install
-npm run build
-npm link
-
-# Initialize your project
-cd path/to/your/project
-memoria init
-
-# Create a brief for your task
-memoria brief create "add password reset" -d "Use existing auth patterns"
-Works With Any AI Agent
+## Works With Any AI Agent
 
 Memoria integrates with **Cursor, Claude Code, Copilot, Continue, Windsurf, Aider**, and any LLM coding tool.
 
 ### Agent Slash Commands
 
-Generate guide files that teach AI tools to use Memoria:
+Memoria can generate guide files that teach AI tools to use Memoria commands:
 
 ```bash
 memoria agent install all
 ```
 
-Then use inside your agent:
+Then use inside your agent chat:
 
 ```text
-/memoria.brief add payment webhook
-/memoria.memory decision Use Stripe for all payments
+/memoria.brief add password reset
+/memoria.memory decision Password reset tokens expire after 15 minutes
 /memoria.ingest
-/memoria.recall add payment webhook
-/meKey Features
+/memoria.recall add password reset
+/memoria.savings add password reset
+```
+
+---
+
+## Key Features
 
 - ✅ **Token Budget Control**: Set hard limits, never overspend
 - ✅ **Savings Tracking**: See exactly how much you save per request
@@ -269,14 +311,18 @@ Then use inside your agent:
 - ✅ **Fast**: TypeScript/Node.js for sub-second recalls
 - ✅ **Type Safe**: Full TypeScript for reliability
 
+---
+
 ## Documentation
 
-- [Full CLI Reference](memoria/README.md)
-- [Roadmap & Planned Features](memoria/PLAN.md)
-- [Contributing Guide](CONTRIBUTING.md)
+- **[Getting Started Guide](GETTING_STARTED.md)** - Complete installation and usage tutorial
+- **[Publishing Guide](PUBLISHING.md)** - How to publish new versions
+- **[Full CLI Reference](memoria/README.md)** - All commands and options
+- **[Roadmap & Plan](memoria/PLAN.md)** - Future features and architecture
 
 ## Community & Support
 
+- [Contributing Guidelines](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)
 - [Get Support](SUPPORT.md)
@@ -291,37 +337,3 @@ MIT. See [LICENSE](LICENSE).
   <strong>Stop wasting tokens. Start saving money.</strong><br />
   Star this repo if Memoria saves you money! ⭐
 </p>
-Memoria can generate guide files that teach AI tools to map `/memoria.*`
-commands to the CLI:
-
-```bash
-memoria agent install all
-```
-
-Example commands to use inside an agent chat:
-
-```text
-/memoria.brief add password reset
-/memoria.memory decision Password reset tokens expire after 15 minutes
-/memoria.ingest
-/memoria.recall add password reset
-/memoria.savings add password reset
-```
-
-## Package
-
-The CLI package, full command reference, and roadmap live in:
-
-- [memoria/README.md](memoria/README.md)
-- [memoria/PLAN.md](memoria/PLAN.md)
-
-## Community
-
-- [Contributing](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
-- [Support](SUPPORT.md)
-
-## License
-
-MIT. See [LICENSE](LICENSE).
