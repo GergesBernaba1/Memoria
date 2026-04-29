@@ -1,6 +1,6 @@
 {
   "name": "memoria-kit",
-  "version": "0.2.2",
+  "version": "0.1.0",
   "description": "Contextual Memory and Prompt Optimization Toolkit for LLM-powered development",
   "type": "module",
   "bin": {
