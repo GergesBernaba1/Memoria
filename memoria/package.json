@@ -12,7 +12,6 @@
     "dist",
     "assets",
     "README.md",
-    "PLAN.md",
     "LICENSE"
   ],
   "scripts": {
