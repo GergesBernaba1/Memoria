@@ -2,39 +2,61 @@
   <img src="memoria/assets/memoria-logo.svg" alt="Memoria" width="520" />
 </p>
 
+<h2 align="center">Your AI coding agent is burning money. Memoria stops that.</h2>
+
 <p align="center">
-  <strong>Stop paying for the same context twice.</strong><br />
-  <strong>Memory-driven, token-aware workflow that cuts AI coding costs by 60-80%.</strong>
+  A <strong>free, offline CLI</strong> that gives Claude, Cursor, Copilot, and Codex<br />
+  a compact memory of your project — so they stop reading your entire codebase on every request.
+</p>
+
+<p align="center">
+  <strong>Real result: 45,234 tokens → 8,167 tokens. $0.68 → $0.12 per request. 82% saved.</strong>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
   <a href="https://www.npmjs.com/package/memoria-kit"><img alt="npm version" src="https://img.shields.io/npm/v/memoria-kit.svg" /></a>
+  <a href="https://www.npmjs.com/package/memoria-kit"><img alt="npm downloads" src="https://img.shields.io/npm/dm/memoria-kit.svg" /></a>
+  <a href="https://github.com/GergesBernaba1/Memoria/actions"><img alt="CI" src="https://github.com/GergesBernaba1/Memoria/actions/workflows/ci.yml/badge.svg" /></a>
   <a href="https://nodejs.org"><img alt="Node.js >=20" src="https://img.shields.io/badge/node-%3E%3D20-339933.svg" /></a>
-  <img alt="CLI first" src="https://img.shields.io/badge/workflow-CLI%20first-111827.svg" />
   <img alt="GitHub stars" src="https://img.shields.io/github/stars/GergesBernaba1/Memoria?style=social" />
 </p>
+
+---
+
+## Why Memoria?
+
+Every time you ask Claude, Cursor, or Copilot to "add a feature", it reads your **entire codebase** — even files that have nothing to do with your task.
+
+**A typical request on a 127-file project:**
+
+```
+Without Memoria: 45,234 tokens × $0.015 = $0.68 per request
+With Memoria:     8,167 tokens × $0.015 = $0.12 per request
+                                          ─────────────────
+You save:                                 $0.56 (82%) — every single request
+```
+
+Do that 50 times a month on a team of 5 and you're burning **$1,680/year** on tokens that do nothing.
+
+Memoria stores a **compact memory of your project** as plain markdown files under `.memoria/`. When you need context, it recalls only the relevant pieces — with a strict token budget — and tells you exactly why each piece was included.
+
+**No database. No daemon. No API key required. Works offline.**
 
 ---
 
 ## Quick Start
 
 ```bash
-# Install
 npm install -g memoria-kit
-
-# Initialize in your project
 cd your-project
-memoria init
 
-# Index your codebase
-memoria ingest
-
-# Start a feature memory workflow
-memoria feature start "add authentication"
+memoria init                                    # set up .memoria/ workspace
+memoria ingest                                  # index your codebase (1-5 min)
+memoria feature start "add authentication"      # create a Feature Memory Packet
 ```
 
-**Copy the output to Copilot, Cursor, ChatGPT, or any AI tool. Save 60-80% on tokens!**
+Paste the output into Claude, Cursor, Copilot, or ChatGPT. Done — you just cut your token bill.
 
 ---
 
@@ -103,19 +125,6 @@ memoria savings "authentication implementation"
 See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed instructions.
 
 ---
-
-## Why Memoria?
-
-**The Problem**: Every time you ask Claude, Cursor, or Copilot to "add a feature", you send your entire codebase. A typical request costs **$0.50-$2.00** in tokens. Do this 50 times a month? That's **$100+ wasted on redundant context**.
-
-**The Solution**: Memoria remembers what your AI agent already knows, recalls only what's relevant, and tracks exactly how much you save.
-
-```
-Before Memoria: 45,000 tokens × $0.015 = $0.68 per request
-After Memoria:   8,200 tokens × $0.015 = $0.12 per request
-                                         ─────────────────
-Savings:                                 $0.56 (82%) ✓
-```
 
 ## Real Case Study
 

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"E:\\\\Gerges Files\\\\Memoria\" log --oneline -15)"
+    ]
+  }
+}
